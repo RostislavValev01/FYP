@@ -1,7 +1,7 @@
-import dearpygui.dearpygui as dpg
+import tkinter as tk
+from tkinter import scrolledtext
 import os
 import google.generativeai as genai
-import screeninfo  
 
 # API key integration
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -20,84 +20,118 @@ model = genai.GenerativeModel(
     system_instruction="Precise outputs only related to cooking. This includes creating recipes, creating meals, step-by-step guidance on how to cook each meal, creating shopping lists, creating lists, tables, professional meal plans all related to cooking. You can also provide nutrition information for each food only if asked. Additionally, you can sometimes add some important health-related tips about the dish you've provided a recipe for. Also don't answer any questions not related to cooking as you're a chef-only chatbot.",
 )
 
-history = [{"role": "model", "parts": ["Hi, I'm your personal chef! How can I help you?"]}] 
+history = [{"role": "model", "parts": ["Hi, I'm your personal chef! How can I help you?"]}]
 
-def send_message(sender, app_data):
-    # Get the user input
-    user_input = dpg.get_value("input_box")
-    
-    # Display the user input in the chat area
-    dpg.add_text(f"You: {user_input}", parent="chat_area", bullet=True)
-    
+# Function to handle sending messages
+def send_message():
+    user_input = input_box.get("1.0", tk.END).strip()
+    if not user_input:
+        return
+
+    # Display user input in chat area
+    chat_area.config(state=tk.NORMAL)
+    chat_area.insert(tk.END, f"You: {user_input}\n")
+
     # Send the user input to the chatbot
     chat_session = model.start_chat(history=history)
     response = chat_session.send_message(user_input)
-    
+
     # Get the chatbot's response
     bot_response = response.text
-    
-    # Display the bot's response in the chat area
-    dpg.add_text(f"Bot: {bot_response}", parent="chat_area", bullet=True)
-    
-    # Update the history with the conversation
+
+    # Display bot response in chat area
+    chat_area.insert(tk.END, f"Bot: {bot_response}\n")
+    chat_area.config(state=tk.DISABLED)
+    chat_area.see(tk.END)
+
+    # Update history
     history.append({"role": "user", "parts": [user_input]})
     history.append({"role": "model", "parts": [bot_response]})
-    
-    dpg.set_scroll_y("chat_area", 1.0)  
-    
-    
-    dpg.set_value("input_box", "")
 
-def close_app(sender, app_data):
-    dpg.destroy_context()
+    # Clear input box
+    input_box.delete("1.0", tk.END)
 
-dpg.create_context()
+# Function to close the app
+def close_app():
+    root.destroy()
 
-# Get the screen resolution dynamically
-screen = screeninfo.get_monitors()[0]  # Gets the monitor resolution
-screen_width = screen.width
-screen_height = screen.height
+# Create the main Tkinter window
+root = tk.Tk()
+root.title("Chef Buddy Chatbot")
+root.configure(bg="white")  # Set background to white
 
-window_height = screen_height - 40  # screen size of window
+# Set window size dynamically based on screen size
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+window_height = screen_height - 40
+root.geometry(f"{screen_width}x{window_height}")
 
-# Add font registry and load chosen font
-with dpg.handler_registry():
-    font_registry = dpg.add_font_registry()  # Create font registry
-    custom_font = dpg.add_font("C:\\Windows\\Fonts\\Arial.ttf", 18, parent=font_registry)  # Add font to registry
+# Make the window resizable
+root.grid_rowconfigure(0, weight=1)  # Make row 0 (chat area) resizable
+root.grid_columnconfigure(0, weight=1)  # Make column 0 (chat area) resizable
 
-# Create the main window with dynamic screen size
-with dpg.handler_registry():
-    dpg.add_key_press_handler(key=dpg.mvKey_Return, callback=send_message)
+# Chat area
+chat_area = scrolledtext.ScrolledText(
+    root,
+    wrap=tk.WORD,
+    state=tk.DISABLED,
+    height=20,
+    font=("Arial", 12),
+    bg="white",
+    fg="black",
+    relief=tk.GROOVE,
+    borderwidth=2,
+)
+chat_area.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
-# Creates the main window
-with dpg.handler_registry():
-    with dpg.window(label="Chef Buddy Chatbot", width=screen_width, height=window_height, autosize=True):
-        
-        dpg.bind_font(custom_font)  # custom font
-        
-        # Creates chat history window
-        with dpg.child_window(width=screen_width - 40, height=window_height - 250, border=True, tag="chat_area", autosize_y=True):
-            # Display the initial greeting message (this will appear at the top of the chat history)
-            dpg.add_text(f"Bot: Hi, I'm your personal chef! How can I help you?", parent="chat_area", bullet=True)
+# Initial greeting
+chat_area.config(state=tk.NORMAL)
+chat_area.insert(tk.END, "Bot: Hi, I'm your personal chef! How can I help you?\n")
+chat_area.config(state=tk.DISABLED)
 
-        
-        with dpg.group(horizontal=True):  # Makes the label and prompt box in a horizontal orientation
-            # Creates the label next to the prompt box
-            dpg.add_text("Type your message:", tag="input_label", bullet=False)
-            # Prompt box
-            dpg.add_input_text(tag="input_box", width=screen_width - 250, height=100)
+# Input box
+input_box = tk.Text(
+    root,
+    height=4,
+    font=("Arial", 12),
+    bg="white",
+    fg="black",
+    relief=tk.GROOVE,
+    borderwidth=2,
+)
+input_box.grid(row=1, column=0, padx=20, pady=(0, 20), sticky="ew")
 
-        # Send button
-        dpg.add_button(label="Send", callback=send_message, width=150, height=60)
+# Button frame
+button_frame = tk.Frame(root, bg="white")
+button_frame.grid(row=2, column=0, pady=10, sticky="ew")
 
-        # Close button 
-        dpg.add_button(label="Close", callback=close_app, width=150, height=60)
+# Send button
+send_button = tk.Button(
+    button_frame,
+    text="Send",
+    command=send_message,
+    width=10,
+    font=("Arial", 12),
+    bg="#0078D7",
+    fg="white",
+    relief=tk.RAISED,
+    borderwidth=2,
+)
+send_button.pack(side=tk.LEFT, padx=10, expand=True)
 
-# Sets up the resolution
-dpg.create_viewport(title='Chef Buddy Chatbot', width=screen_width, height=window_height)
-dpg.setup_dearpygui()
-dpg.show_viewport()
+# Close button
+close_button = tk.Button(
+    button_frame,
+    text="Close",
+    command=close_app,
+    width=10,
+    font=("Arial", 12),
+    bg="#D9534F",
+    fg="white",
+    relief=tk.RAISED,
+    borderwidth=2,
+)
+close_button.pack(side=tk.LEFT, padx=10, expand=True)
 
-# Runs the app
-dpg.start_dearpygui()
-dpg.destroy_context()
+# Start the Tkinter main loop
+root.mainloop()
