@@ -7,7 +7,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-image: url('/images/background.jpg');  /* Correct path */
+    background-image: url('/images/background.jpg');  
     background-size: cover;
     background-position: center;
     display: flex;
@@ -18,7 +18,7 @@ body {
 }
 
 
-/* Account Button (Top Right) */
+/* Account Button */
 .account-btn {
     position: fixed;
     top: 20px;
@@ -26,10 +26,10 @@ body {
     background-color: #0078D7;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 20px 40px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 20px;
     text-decoration: none;
     transition: background-color 0.3s ease;
 }
@@ -60,6 +60,17 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px; /* Space between messages */
+}
+#thinking-message {
+    background-color: #f0f0f0;
+    color: #555;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+    margin-bottom: 10px;
+    align-self: center;
 }
 
 /* Message Styles */
