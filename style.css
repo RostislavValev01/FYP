@@ -1,0 +1,132 @@
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/images/background.jpg');  /* Correct path */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+
+/* Account Button (Top Right) */
+.account-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.account-btn:hover {
+    background-color: #005fa3;
+}
+
+/* Chat Container */
+.chat-container {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for the chat box */
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    height: calc(100vh - 80px); /* Adjust for navbar height */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 80px; /* Push the chat container below the navbar */
+    overflow: hidden;
+}
+
+/* Chat Box */
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between messages */
+}
+
+/* Message Styles */
+.message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    max-width: 80%;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+/* Bot Message */
+.bot-message {
+    background-color: #e1f7d5;
+    align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* User Message */
+.user-message {
+    background-color: #d1e8ff;
+    align-self: flex-end;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Textarea for User Input */
+textarea {
+    width: calc(100% - 20px);
+    height: 60px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 10px;
+    font-size: 14px;
+    resize: none;
+    box-sizing: border-box;
+}
+
+/* Send Button */
+button {
+    padding: 12px 20px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 0 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Button Hover Effect */
+button:hover {
+    background-color: #005fa3;
+}
+
+/* Scrollbar Styling */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background-color: #f4f4f4;
+}
