@@ -24,14 +24,32 @@ app.post('/chat', async (req, res) => {
     }
 
     try {
+        // Define the explicit instructions for the model
+        const instructions = `
+            You are a chatbot specifically designed to recommend cooking recipes and assist with cooking-related queries.
+            - You can provide recipes with ingredients, step-by-step instructions and create shopping lists when asked.
+            - If asked about what you can do, say: "I can recommend recipes, suggest ingredients, provide cooking instructions and create shopping lists."
+            - If the user asks about anything unrelated to cooking, respond politely by saying: "Sorry, I can only assist with cooking-related questions."
+            - Always respond in a structured format, especially when providing recipes: List the ingredients first, followed by step-by-step instructions.
+        `;
+
+        // Combine the instructions with the user's input to form the full prompt
+        const prompt = instructions + "\n\nUser: " + userInput + "\n\nBot:";
+
+        // Log the prompt for debugging purposes
+        console.log("Prompt sent to model: ", prompt);
+
         // Generate content using the Gemini model
-        const result = await model.generateContent(userInput);  // Pass the user input as the prompt
-        const botResponse = result.response.text();  // Get the generated response
+        const result = await model.generateContent(prompt);  // Pass the modified prompt
+        const botResponse = result.response.text();  // Extract the generated response
+
+        // Log the response for debugging purposes
+        console.log("Response from model: ", botResponse);
 
         // Send the bot's response back to the client
         res.json({ botResponse });
     } catch (error) {
-        console.error(error);
+        console.error("Error with API request: ", error);
         res.status(500).json({ error: 'Error with the API request' });  // Handle any errors
     }
 });
