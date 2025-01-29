@@ -1,24 +1,24 @@
-/* Global Styles */
+/* Reset some default styles */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* Main page styling */
 body {
     font-family: Arial, sans-serif;
     background-image: url('/images/background.jpg');  
     background-size: cover;
     background-position: center;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     height: 100vh;
     margin: 0;
 }
 
-
-/* Account Button */
+/* Floating account button in the top right */
 .account-btn {
     position: fixed;
     top: 20px;
@@ -26,10 +26,10 @@ body {
     background-color: #0078D7;
     color: white;
     border: none;
-    padding: 20px 40px;
+    padding: 25px 60px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 16px;
     text-decoration: none;
     transition: background-color 0.3s ease;
 }
@@ -38,29 +38,44 @@ body {
     background-color: #005fa3;
 }
 
-/* Chat Container */
+/* Chat title with a slightly transparent background for better readability */
+.chat-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2E8B57;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat container holding the messages */
 .chat-container {
-    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent background for the chat box */
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
     width: 90%;
     max-width: 450px;
-    height: calc(100vh - 80px); /* Adjust for navbar height */
+    height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    margin-top: 80px; /* Push the chat container below the navbar */
     overflow: hidden;
 }
 
-/* Chat Box */
+/* Chat area where messages appear */
 .chat-box {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between messages */
+    gap: 15px;
 }
+
+/* Temporary "thinking" message while waiting for a response */
 #thinking-message {
     background-color: #f0f0f0;
     color: #555;
@@ -73,7 +88,7 @@ body {
     align-self: center;
 }
 
-/* Message Styles */
+/* General message styling */
 .message {
     padding: 12px 15px;
     border-radius: 8px;
@@ -83,21 +98,21 @@ body {
     word-wrap: break-word;
 }
 
-/* Bot Message */
+/* Bot messages (green background) */
 .bot-message {
     background-color: #e1f7d5;
     align-self: flex-start;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* User Message */
+/* User messages (blue background) */
 .user-message {
     background-color: #d1e8ff;
     align-self: flex-end;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Textarea for User Input */
+/* Input field for user messages */
 textarea {
     width: calc(100% - 20px);
     height: 60px;
@@ -110,7 +125,7 @@ textarea {
     box-sizing: border-box;
 }
 
-/* Send Button */
+/* Send button */
 button {
     padding: 12px 20px;
     background-color: #0078D7;
@@ -123,12 +138,12 @@ button {
     transition: background-color 0.3s ease;
 }
 
-/* Button Hover Effect */
+/* Send button hover effect */
 button:hover {
     background-color: #005fa3;
 }
 
-/* Scrollbar Styling */
+/* Scrollbar customization */
 .chat-box::-webkit-scrollbar {
     width: 8px;
 }
@@ -140,4 +155,73 @@ button:hover {
 
 .chat-box::-webkit-scrollbar-track {
     background-color: #f4f4f4;
+}
+
+/* Authentication form container */
+.auth-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+}
+
+/* Title styling for authentication forms */
+.auth-container h2 {
+    color: #2E8B57;
+    margin-bottom: 20px;
+}
+
+/* Labels for input fields */
+.auth-container label {
+    display: block;
+    text-align: left;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Input fields for email and password */
+.auth-container input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Sign in / Sign up button */
+.auth-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.auth-container button:hover {
+    background-color: #005fa3;
+}
+
+/* Links for switching between sign in and sign up pages */
+.auth-container p {
+    margin-top: 15px;
+}
+
+.auth-container a {
+    color: #0078D7;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
 }
