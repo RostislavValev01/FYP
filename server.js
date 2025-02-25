@@ -118,7 +118,7 @@ app.post('/chat', async (req, res) => {
 
 // User sign-up
 app.post('/signup', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, preferences, goal } = req.body;
 
     if (!email || !password) {
         return res.status(400).send('Email and password are required');
@@ -131,7 +131,17 @@ app.post('/signup', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword });
+
+        // Ensure preferences is always an array
+        const formattedPreferences = Array.isArray(preferences) ? preferences : [preferences];
+
+        const newUser = new User({ 
+            email, 
+            password: hashedPassword, 
+            preferences: formattedPreferences, 
+            goal 
+        });
+
         await newUser.save();
 
         res.send(`
@@ -145,8 +155,6 @@ app.post('/signup', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
-// User sign-in
 app.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
@@ -166,7 +174,13 @@ app.post('/signin', async (req, res) => {
             return res.status(400).send('Invalid password');
         }
 
-        req.session.user = user;
+        // Store user in session
+        req.session.user = {
+            email: user.email,
+            preferences: user.preferences,
+            goal: user.goal
+        };
+
         res.redirect('/index.html');
     } catch (err) {
         console.log(err);
@@ -174,18 +188,48 @@ app.post('/signin', async (req, res) => {
     }
 });
 
+
+
+
+
+
+
 // Restrict access to recipes page
-app.get('/recipes', (req, res) => {
-    if (!req.session.user) {
-        return res.status(403).send(`
-            <script>
-                alert("You need to log in to access your recipes.");
-                window.location.href = "/signin";
-            </script>
-        `);
+app.get('/check-login', (req, res) => {
+    if (req.session.user) {
+        res.json({ 
+            loggedIn: true, 
+            email: req.session.user.email 
+        });
+    } else {
+        res.json({ loggedIn: false });
     }
-    res.sendFile(path.join(__dirname, 'public', 'recipes.html'));
 });
+
+app.get('/account-data', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+        const user = await User.findOne({ email: req.session.user.email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.json({
+            email: user.email,
+            preferences: user.preferences || [],
+            goal: user.goal || "Not Set"
+        });
+    } catch (err) {
+        console.error("Error fetching account data:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

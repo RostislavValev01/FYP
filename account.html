@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>My Account</h2>
+    <p>Welcome, user! This is your account dashboard.</p>
+    <a href="logout.html">Log Out</a>
+    <a href="index.html" class="home-btn">Home</a>
+
+    <div class="account-container">
+        <h2>My Account</h2>
+        <p><strong>Email:</strong> <span id="user-email"></span></p>
+        
+        <h3>Food Preferences</h3>
+        <ul id="food-preferences"></ul>
+        
+        <h3>Goal</h3>
+        <p id="user-goal"></p>
+        
+        <button id="change-password">Change Password</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/account-data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("user-email").textContent = data.email;
+                    document.getElementById("user-goal").textContent = data.goal || "Not Set";
+    
+                    const foodList = document.getElementById("food-preferences");
+                    foodList.innerHTML = "";
+    
+                    if (data.preferences && data.preferences.length > 0) {
+                        data.preferences.forEach(pref => {
+                            const li = document.createElement("li");
+                            li.textContent = pref;
+                            foodList.appendChild(li);
+                        });
+                    } else {
+                        foodList.innerHTML = "<p>No preferences set.</p>";
+                    }
+                })
+                .catch(error => console.error("Error fetching account data:", error));
+        });
+    </script>
+    
+</body>
+</html>
