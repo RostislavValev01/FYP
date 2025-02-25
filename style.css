@@ -1,0 +1,327 @@
+/* Reset some default styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main page styling */
+body {
+    font-family: Arial, sans-serif;
+    background-image: url('/images/background.jpg');  
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+/* Style for slider container */
+.slider-container {
+    position: fixed;
+    left: 20px; /* Moves it to the left */
+    top: 50%; /* Centers it vertically */
+    transform: translateY(-50%); /* Ensures proper centering */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Labels for slider */
+.slider-container h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.slider-container label {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 5px;
+}
+
+/* Slider itself */
+#response-length {
+    width: 120px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+
+/* Floating account button in the top right */
+.account-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 25px 60px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.account-btn:hover {
+    background-color: #005fa3;
+}
+
+
+
+.my-recipes-btn {
+    position: fixed;
+    top: 20px;
+    right: 170px; 
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.my-recipes-btn:hover {
+    background-color: #005fa3;
+}
+
+
+.account-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px; 
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.account-btn:hover {
+    background-color: #005fa3;
+}
+
+
+
+
+/* "Back to Homepage" Button (On Non-Homepage Pages) */
+.home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.home-btn:hover {
+    background-color: #005fa3;
+}
+
+/* Chat title with a slightly transparent background for better readability */
+.chat-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2E8B57;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat container - Increased width for better message display */
+.chat-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    width: 70%; 
+    max-width: 800px; 
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Chat area where messages appear */
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%; /* Ensuring messages use full width */
+}
+
+/* Temporary "thinking" message while waiting for a response */
+#thinking-message {
+    background-color: #f0f0f0;
+    color: #555;
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+    margin-bottom: 10px;
+    align-self: center;
+}
+
+/* General message styling */
+.message {
+    padding: 12px 15px;
+    border-radius: 8px;
+    max-width: 90%; 
+    font-size: 16px; 
+    line-height: 1.6; 
+    word-wrap: break-word;
+}
+
+/* Bot messages (green background) */
+.bot-message {
+    background-color: #e1f7d5;
+    align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* User messages (blue background) */
+.user-message {
+    background-color: #d1e8ff;
+    align-self: flex-end;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Input field for user messages */
+textarea {
+    width: 95%;
+    height: 60px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 10px auto;
+    font-size: 16px;
+    resize: none;
+    box-sizing: border-box;
+}
+
+/* Send button */
+button {
+    padding: 14px 24px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 0 10px 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Send button hover effect */
+button:hover {
+    background-color: #005fa3;
+}
+
+/* Scrollbar customization */
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background-color: #f4f4f4;
+}
+
+/* Authentication form container */
+.auth-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+}
+
+/* Title styling for authentication forms */
+.auth-container h2 {
+    color: #2E8B57;
+    margin-bottom: 20px;
+}
+
+/* Labels for input fields */
+.auth-container label {
+    display: block;
+    text-align: left;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Input fields for email and password */
+.auth-container input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Sign in / Sign up button */
+.auth-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Button hover effect */
+.auth-container button:hover {
+    background-color: #005fa3;
+}
+
+/* Links for switching between sign in and sign up pages */
+.auth-container p {
+    margin-top: 15px;
+}
+
+.auth-container a {
+    color: #0078D7;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
+}

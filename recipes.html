@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipes</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/check-login')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.loggedIn) {
+                        alert("You need to login to access your recipes.");
+                        window.location.href = "signin.html"; 
+                    }
+                })
+                .catch(error => console.error("Error checking login status:", error));
+        });
+    </script>
+</head>
+<body>
+
+    
+    <a href="index.html" class="home-btn">Home</a>
+
+    <div class="recipe-container">
+        <h2>Recent Recipes</h2>
+        <div id="recent-recipes"></div>
+
+        <h2>Favourite Recipes</h2>
+        <div id="favourite-recipes"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
