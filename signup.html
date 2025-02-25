@@ -8,10 +8,7 @@
 </head>
 <body>
 
-   
     <a href="index.html" class="home-btn">Home</a>
-
-    >
     <a href="recipes.html" class="my-recipes-btn">My Recipes</a>
 
     <div class="auth-container">
@@ -25,6 +22,20 @@
 
             <label for="confirm-password">Confirm Password</label>
             <input type="password" id="confirm-password" name="confirm-password" required>
+
+            <!-- Food Preferences -->
+            <h3>Food Preferences</h3>
+            <label><input type="checkbox" name="preferences" value="Vegetarian"> Vegetarian</label><br>
+            <label><input type="checkbox" name="preferences" value="Vegan"> Vegan</label><br>
+            <label><input type="checkbox" name="preferences" value="Halal"> Halal</label><br>
+
+            <!-- Goal Selection -->
+            <h3>Cooking Goal</h3>
+            <select name="goal">
+                <option value="Learn to cook healthy food">I want to learn to cook healthy food</option>
+                <option value="Improvise with new recipes">I just want to improvise with new recipes</option>
+                <option value="Learn new varieties of food">I want to learn how to cook new varieties of food</option>
+            </select>
 
             <button type="submit">Sign Up</button>
         </form>
