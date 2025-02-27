@@ -50,6 +50,7 @@ body {
     width: 120px;
     cursor: pointer;
     margin: 10px 0;
+    accent-color: #2E8B57;
 }
 
 
@@ -58,7 +59,7 @@ body {
     position: fixed;
     top: 20px;
     right: 20px;
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     padding: 25px 60px;
@@ -69,8 +70,9 @@ body {
     transition: background-color 0.3s ease;
 }
 
+
 .account-btn:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 
@@ -79,7 +81,7 @@ body {
     position: fixed;
     top: 20px;
     right: 170px; 
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -91,7 +93,7 @@ body {
 }
 
 .my-recipes-btn:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 
@@ -99,7 +101,7 @@ body {
     position: fixed;
     top: 20px;
     right: 20px; 
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -111,7 +113,7 @@ body {
 }
 
 .account-btn:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 
@@ -122,7 +124,7 @@ body {
     position: fixed;
     top: 20px;
     left: 20px;
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -134,7 +136,7 @@ body {
 }
 
 .home-btn:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 /* Chat title with a slightly transparent background for better readability */
@@ -228,7 +230,7 @@ textarea {
 /* Send button */
 button {
     padding: 14px 24px;
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     border-radius: 8px;
@@ -240,7 +242,7 @@ button {
 
 /* Send button hover effect */
 button:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 /* Scrollbar customization */
@@ -296,7 +298,7 @@ button:hover {
 .auth-container button {
     width: 100%;
     padding: 12px;
-    background-color: #0078D7;
+    background-color: #2E8B57;
     color: white;
     border: none;
     border-radius: 5px;
@@ -308,7 +310,7 @@ button:hover {
 
 /* Button hover effect */
 .auth-container button:hover {
-    background-color: #005fa3;
+    background-color: #246b43;
 }
 
 /* Links for switching between sign in and sign up pages */
@@ -317,7 +319,7 @@ button:hover {
 }
 
 .auth-container a {
-    color: #0078D7;
+    color: #2E8B57;
     text-decoration: none;
     font-weight: bold;
 }
@@ -325,6 +327,54 @@ button:hover {
 .auth-container a:hover {
     text-decoration: underline;
 }
+/* White box for My Account title & Welcome message */
+.account-title-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Title & Welcome message color (same as homepage title) */
+.account-title-box h2, 
+.account-title-box p {
+    color: #2E8B57; /* Same as "Your Personal Cooking Assistant" on homepage */
+}
+
+/* Account Page Container */
+.account-container {
+    background: rgba(255, 255, 255, 0.9);
+    width: 90%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Logout Button Styling */
+#logout-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #2E8B57;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px; /* Adds spacing */
+    transition: background 0.3s ease;
+}
+
+#logout-btn:hover {
+    background: #246b43;
+}
+
 /* Account Page Styling */
 .account-container {
     background: rgba(255, 255, 255, 0.9);
@@ -338,7 +388,7 @@ button:hover {
 }
 
 .account-container h2 {
-    color: #0078D7;
+    color: #2E8B57;
     margin-bottom: 15px;
 }
 
@@ -360,7 +410,7 @@ button:hover {
 }
 
 #change-password {
-    background: #0078D7;
+    background: #2E8B57;
     color: white;
     padding: 12px;
     border: none;
@@ -373,7 +423,7 @@ button:hover {
 }
 
 #change-password:hover {
-    background: #005fa3;
+    background: #246b43;
 }
 
 /* Centering content */
@@ -389,7 +439,7 @@ body {
 .home-btn, .logout-btn {
     position: fixed;
     top: 20px;
-    background: #0078D7;
+    background: #2E8B57;
     color: white;
     padding: 12px 24px;
     border-radius: 5px;
@@ -473,5 +523,5 @@ body {
 }
 
 .home-btn:hover, .logout-btn:hover {
-    background: #005fa3;
+    background: #246b43;
 }
