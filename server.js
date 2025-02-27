@@ -37,6 +37,19 @@ app.use(session({
 app.get('/signin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'signin.html'));
 });
+app.get('/get-recipes', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "You need to log in to view your recipes." });
+    }
+
+    try {
+        const recipes = await Recipe.find({ user: req.session.user._id });
+        res.json({ success: true, recipes });
+    } catch (error) {
+        console.error("Error fetching recipes:", error);
+        res.status(500).json({ success: false, message: "Error retrieving recipes." });
+    }
+});
 
 // Check if user is logged in
 app.get('/check-login', (req, res) => {
@@ -54,20 +67,19 @@ app.post('/chat', async (req, res) => {
     }
 
     const userInput = req.body.userInput;
-    const responseLength = req.body.responseLength || "2"; // Default to medium length
+    const responseLength = req.body.responseLength || "2"; //Get response length from request
 
     if (!userInput) {
         return res.status(400).json({ botResponse: "Please enter a valid recipe request." });
     }
 
-    // Adjust response based on slider value
     let lengthInstruction = "";
     if (responseLength === "1") {
-        lengthInstruction = "Provide a concise yet useful response, summarizing key points.";
+        lengthInstruction = "Provide a concise yet useful response.";
     } else if (responseLength === "3") {
-        lengthInstruction = "Provide an extremely detailed response with variations, tips, and fun facts.";
+        lengthInstruction = "Provide an extremely detailed response.";
     } else {
-        lengthInstruction = "Provide a balanced response with a good level of detail.";
+        lengthInstruction = "Provide a balanced response.";
     }
 
     try {
@@ -83,7 +95,7 @@ app.post('/chat', async (req, res) => {
         - **Instructions**
         - **Ingredient Substitutions & Variations**
         - **Fun Facts & Cooking Tips**
-        
+
         **Safety & Responsibility:**
         - Do not generate responses that involve harmful, dangerous, or illegal content.
         - Keep all responses focused on cooking and food safety.
@@ -93,21 +105,11 @@ app.post('/chat', async (req, res) => {
         Bot:
         `;
 
-        console.log("Prompt sent to model: ", prompt);
-
         const result = await model.generateContent(prompt);
         let botResponse = result.response.text();
+
+        // Ensure response keeps structured format including line breaks
         botResponse = botResponse.replace(/\n/g, '<br>');
-
-        console.log("Response from model: ", botResponse);
-
-        // Save the recipe to the database
-        const newRecipe = new Recipe({
-            user: req.session.user._id,
-            name: userInput,
-            content: botResponse
-        });
-        await newRecipe.save();
 
         res.json({ botResponse });
     } catch (error) {
@@ -115,6 +117,9 @@ app.post('/chat', async (req, res) => {
         res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
+
+
+
 
 // User sign-up
 app.post('/signup', async (req, res) => {
@@ -174,8 +179,9 @@ app.post('/signin', async (req, res) => {
             return res.status(400).send('Invalid password');
         }
 
-        // Store user in session
+        // Store user in session with ID
         req.session.user = {
+            _id: user._id,  // Ensure _id is included
             email: user.email,
             preferences: user.preferences,
             goal: user.goal
@@ -187,12 +193,6 @@ app.post('/signin', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
-
-
-
-
-
-
 
 // Restrict access to recipes page
 app.get('/check-login', (req, res) => {
@@ -228,6 +228,36 @@ app.get('/account-data', async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
+app.post('/save-recipe', async (req, res) => {
+    if (!req.session.user || !req.session.user._id) {
+        return res.status(401).json({ success: false, message: "You need to log in to save recipes." });
+    }
+
+    const { recipeContent } = req.body;
+
+    if (!recipeContent || recipeContent.trim() === "") {
+        return res.status(400).json({ success: false, message: "Recipe content is required." });
+    }
+
+    try {
+        const newRecipe = new Recipe({
+            user: req.session.user._id, 
+            content: recipeContent
+        });
+
+        await newRecipe.save();
+        res.json({ success: true, message: "Recipe saved successfully!" });
+    } catch (error) {
+        console.error("Error saving recipe:", error);
+        res.status(500).json({ success: false, message: "Error saving recipe." });
+    }
+});
+
+
+
+
 
 
 
