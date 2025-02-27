@@ -59,6 +59,16 @@ app.get('/check-login', (req, res) => {
         res.json({ loggedIn: false });
     }
 });
+//Logout Route
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error("Error logging out:", err);
+            return res.status(500).json({ success: false, message: "Error logging out." });
+        }
+        res.json({ success: true, message: "Logged out successfully!" });
+    });
+});
 
 // Chatbot logic with response length control
 app.post('/chat', async (req, res) => {
