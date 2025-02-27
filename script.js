@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let latestRecipe = ""; // Store the latest recipe response
-
-    // ✅ Restore check-login logic
+    // ✅ Check login status on page load
     fetch('/check-login')
         .then(response => response.json())
         .then(data => {
@@ -9,6 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.loggedIn) {
                 accountBtn.textContent = "My Account";
                 accountBtn.href = "account.html"; 
+            } else {
+                accountBtn.textContent = "Sign In";
+                accountBtn.href = "signin.html"; 
             }
         })
         .catch(error => console.error("Error checking login status:", error));

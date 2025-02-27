@@ -9,7 +9,22 @@
 <body>
     <h2>My Account</h2>
     <p>Welcome, user! This is your account dashboard.</p>
-    <a href="logout.html">Log Out</a>
+    <button id="logout-btn">Log Out</button>
+    <script>
+        document.getElementById("logout-btn").addEventListener("click", function () {
+            fetch("/logout")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Logged out successfully!");
+                        window.location.href = "signin.html"; // Redirect to sign-in page
+                    } else {
+                        alert("Logout failed. Try again.");
+                    }
+                })
+                .catch(error => console.error("Error logging out:", error));
+        });
+        </script>
     <a href="index.html" class="home-btn">Home</a>
 
     <div class="account-container">
