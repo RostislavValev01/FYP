@@ -1,7 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
     let latestRecipe = ""; // Store the latest recipe response
 
-    // Capture the response length from the slider
+    // ✅ Restore check-login logic
+    fetch('/check-login')
+        .then(response => response.json())
+        .then(data => {
+            const accountBtn = document.getElementById("account-btn");
+            if (data.loggedIn) {
+                accountBtn.textContent = "My Account";
+                accountBtn.href = "account.html"; 
+            }
+        })
+        .catch(error => console.error("Error checking login status:", error));
+
+    // ✅ Capture the response length from the slider
     const responseLengthSlider = document.getElementById("response-length");
     let responseLength = responseLengthSlider.value; // Default value
 
@@ -10,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
         responseLength = this.value;
     });
 
-    // Function to send message to chatbot
+    // ✅ Function to send message to chatbot
     function sendMessage() {
         let userInput = document.getElementById('user-input').value.trim();
         
@@ -28,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput, responseLength }),  //Send response length to server
+            body: JSON.stringify({ userInput, responseLength }),  // ✅ Send response length to server
             credentials: 'include'
         })
         .then(response => response.json())
@@ -41,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             displayMessage(data.botResponse, 'bot');
-            latestRecipe = data.botResponse; // Correctly store the latest chatbot response
+            latestRecipe = data.botResponse; // ✅ Correctly store the latest chatbot response
         })
         .catch(error => {
             console.error("Error:", error);
@@ -52,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById('send-btn').addEventListener('click', sendMessage);
 
-    //Save Recipe Button Functionality
+    // ✅ Save Recipe Button Functionality
     document.getElementById("save-recipe-btn").addEventListener("click", function () {
         if (!latestRecipe || latestRecipe.trim() === "") {
             alert("No recipe to save.");
@@ -77,8 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
-// Display message function
+// ✅ Display message function
 function displayMessage(message, sender) {
     const chatBox = document.getElementById('chat-box');
     const messageDiv = document.createElement('div');
@@ -87,6 +98,7 @@ function displayMessage(message, sender) {
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
+
 
 document.getElementById('send-btn').addEventListener('click', sendMessage);
 
