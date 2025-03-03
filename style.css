@@ -1,172 +1,91 @@
-/* Reset some default styles */
+/* Reset and general styles */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Main page styling */
 body {
     font-family: Arial, sans-serif;
-    background-image: url('/images/background.jpg');  
+    background-image: url('/images/background.jpg');  /* Re-added background */
     background-size: cover;
     background-position: center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
 }
-/* Style for slider container */
-.slider-container {
+
+/* Navbar styles */
+.navbar {
     position: fixed;
-    left: 20px; /* Moves it to the left */
-    top: 50%; /* Centers it vertically */
-    transform: translateY(-50%); /* Ensures proper centering */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: white;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 15px 40px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
-/* Labels for slider */
-.slider-container h3 {
-    margin-bottom: 10px;
-    font-size: 16px;
-    text-align: center;
-}
-
-.slider-container label {
-    font-size: 14px;
+.logo {
+    font-size: 22px;
     font-weight: bold;
-    margin: 5px;
-}
-
-/* Slider itself */
-#response-length {
-    width: 120px;
-    cursor: pointer;
-    margin: 10px 0;
-    accent-color: #2E8B57;
-}
-
-
-/* Floating account button in the top right */
-.account-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #2E8B57;
-    color: white;
-    border: none;
-    padding: 25px 60px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+    color: #333;
     text-decoration: none;
-    transition: background-color 0.3s ease;
 }
 
-
-.account-btn:hover {
-    background-color: #246b43;
+.nav-links {
+    display: flex;
+    gap: 15px;
 }
 
-
-
-.my-recipes-btn {
-    position: fixed;
-    top: 20px;
-    right: 170px; 
-    background-color: #2E8B57;
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+.nav-btn {
     text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.my-recipes-btn:hover {
-    background-color: #246b43;
-}
-
-
-.account-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px; 
-    background-color: #2E8B57;
-    color: white;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 5px;
-    cursor: pointer;
     font-size: 16px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.account-btn:hover {
-    background-color: #246b43;
-}
-
-
-
-
-/* "Back to Homepage" Button (On Non-Homepage Pages) */
-.home-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background-color: #2E8B57;
-    color: white;
-    border: none;
-    padding: 15px 40px;
+    color: #333;
+    padding: 10px 20px;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
+    transition: background 0.3s;
 }
 
-.home-btn:hover {
-    background-color: #246b43;
+.nav-btn:hover {
+    background: #2E8B57;  /* Changed hover color to green */
+    color: white;
 }
 
-/* Chat title with a slightly transparent background for better readability */
+/* Chat Title */
 .chat-title {
     font-size: 24px;
     font-weight: bold;
-    color: #2E8B57;
+    color: #000000;
     text-align: center;
     background: rgba(255, 255, 255, 0.8);
     padding: 10px 20px;
     border-radius: 10px;
-    margin-top: 20px;
+    margin-top: 80px;
     margin-bottom: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Chat container - Increased width for better message display */
+/* Chat Container */
 .chat-container {
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    width: 70%; 
-    max-width: 800px; 
+    width: 70%;
+    max-width: 800px;
     height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    margin-top: 20px;
 }
 
-/* Chat area where messages appear */
+/* Chat Box */
 .chat-box {
     flex: 1;
     padding: 20px;
@@ -174,47 +93,25 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 100%; /* Ensuring messages use full width */
 }
 
-/* Temporary "thinking" message while waiting for a response */
-#thinking-message {
-    background-color: #f0f0f0;
-    color: #555;
-    font-style: italic;
-    text-align: center;
-    padding: 10px;
-    border-radius: 10px;
-    max-width: 80%;
-    margin-bottom: 10px;
-    align-self: center;
-}
-
-/* General message styling */
-.message {
-    padding: 12px 15px;
-    border-radius: 8px;
-    max-width: 90%; 
-    font-size: 16px; 
-    line-height: 1.6; 
-    word-wrap: break-word;
-}
-
-/* Bot messages (green background) */
-.bot-message {
-    background-color: #e1f7d5;
-    align-self: flex-start;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* User messages (blue background) */
+/* User Messages */
 .user-message {
     background-color: #d1e8ff;
     align-self: flex-end;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px 15px;
+    border-radius: 8px;
 }
 
-/* Input field for user messages */
+/* Bot Messages */
+.bot-message {
+    background-color: #e1f7d5;
+    align-self: flex-start;
+    padding: 12px 15px;
+    border-radius: 8px;
+}
+
+/* Text Input */
 textarea {
     width: 95%;
     height: 60px;
@@ -226,12 +123,43 @@ textarea {
     resize: none;
     box-sizing: border-box;
 }
+/* Account Page Container */
+.account-container {
+    background: white; /* White background */
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    text-align: center;
+    margin: 50px auto; /* Center the box */
+}
 
-/* Send button */
+/* Title Box for Account Page */
+.account-title-box {
+    background: white; /* White background */
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for better contrast */
+}
+
+/* Centering Main Content */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Buttons */
 button {
     padding: 14px 24px;
-    background-color: #2E8B57;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -239,28 +167,48 @@ button {
     margin: 0 10px 20px;
     transition: background-color 0.3s ease;
 }
+/* Logout Button in Navbar */
+#logout-btn {
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    background-color: transparent;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
 
-/* Send button hover effect */
+#logout-btn:hover {
+    background: #2E8B57;  /* Matches the My Recipes button */
+    color: white;
+}
+
+/* Change Password Button */
+#change-password {
+    background-color: #2E8B57; /* Green background */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#change-password:hover {
+    background-color: #246b43; /* Darker green on hover */
+}
+
+
 button:hover {
-    background-color: #246b43;
+    background-color: #246b43;  /* Changed hover color to green */
 }
 
-/* Scrollbar customization */
-.chat-box::-webkit-scrollbar {
-    width: 8px;
-}
-
-.chat-box::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
-}
-
-.chat-box::-webkit-scrollbar-track {
-    background-color: #f4f4f4;
-}
-
-/* Authentication form container */
-.auth-container {
+/* Authentication and Recipe Pages */
+.auth-container,
+.recipe-container {
     background: rgba(255, 255, 255, 0.9);
     padding: 30px;
     border-radius: 10px;
@@ -271,21 +219,12 @@ button:hover {
     margin: 100px auto;
 }
 
-/* Title styling for authentication forms */
-.auth-container h2 {
-    color: #2E8B57;
-    margin-bottom: 20px;
+/* Titles */
+.auth-container h2, .recipe-container h2 {
+    color: #000000;
 }
 
-/* Labels for input fields */
-.auth-container label {
-    display: block;
-    text-align: left;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-/* Input fields for email and password */
+/* Inputs */
 .auth-container input {
     width: 100%;
     padding: 10px;
@@ -293,9 +232,105 @@ button:hover {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+/* Navbar Buttons */
+.account-btn {
+    text-decoration: none;
+    font-size: 16px;
+    color: rgb(0, 0, 0);
+    background-color: #ffffff;  /* Green Background */
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
 
-/* Sign in / Sign up button */
-.auth-container button {
+.account-btn:hover {
+    background: #2E8B57;  /* Darker Green Hover Effect */
+    color: white;
+}
+/* Fix Recipe Box Overflow */
+.recipe-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+    max-height: 500px; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+
+
+
+
+/* Green styling for Send and Save Recipe buttons */
+#send-btn, #save-recipe-btn {
+    background-color: #2E8B57; /* Green background */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect */
+#send-btn:hover, #save-recipe-btn:hover {
+    background-color: #246b43; /* Darker green on hover */
+}
+
+/* Style for the Slider Container */
+.slider-container {
+    width: 75%;  /* Make it 75% of the chat box width */
+    margin: 10px auto; /* Center it horizontally */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Title above slider */
+.slider-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+
+/* Style the slider thumb (the circular knob) */
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: black;  /* Changes knob to black */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+
+
+
+
+
+/* Left and Right Labels */
+.slider-labels {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+    padding: 0 10px; /* Add slight padding */
+}
+
+
+/* Buttons */
+.auth-container button, .recipe-container button {
     width: 100%;
     padding: 12px;
     background-color: #2E8B57;
@@ -308,220 +343,6 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
-/* Button hover effect */
-.auth-container button:hover {
-    background-color: #246b43;
-}
-
-/* Links for switching between sign in and sign up pages */
-.auth-container p {
-    margin-top: 15px;
-}
-
-.auth-container a {
-    color: #2E8B57;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.auth-container a:hover {
-    text-decoration: underline;
-}
-/* White box for My Account title & Welcome message */
-.account-title-box {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    width: 90%;
-    max-width: 600px;
-    margin: 20px auto;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Title & Welcome message color (same as homepage title) */
-.account-title-box h2, 
-.account-title-box p {
-    color: #2E8B57; /* Same as "Your Personal Cooking Assistant" on homepage */
-}
-
-/* Account Page Container */
-.account-container {
-    background: rgba(255, 255, 255, 0.9);
-    width: 90%;
-    max-width: 500px;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    margin-top: 20px;
-}
-
-/* Logout Button Styling */
-#logout-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #2E8B57;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 15px; /* Adds spacing */
-    transition: background 0.3s ease;
-}
-
-#logout-btn:hover {
-    background: #246b43;
-}
-
-/* Account Page Styling */
-.account-container {
-    background: rgba(255, 255, 255, 0.9);
-    width: 90%;
-    max-width: 500px;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    margin-top: 50px;
-}
-
-.account-container h2 {
-    color: #2E8B57;
-    margin-bottom: 15px;
-}
-
-.account-container p, .account-container ul {
-    font-size: 18px;
-    color: #333;
-}
-
-.account-container ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.account-container ul li {
-    background: #e3f2fd;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 8px;
-}
-
-#change-password {
-    background: #2E8B57;
-    color: white;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 20px;
-    width: 100%;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-#change-password:hover {
-    background: #246b43;
-}
-
-/* Centering content */
-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
-
-/* Home and Logout buttons */
-.home-btn, .logout-btn {
-    position: fixed;
-    top: 20px;
-    background: #2E8B57;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-/* Container for saved recipes */
-.recipe-container {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px;
-    border-radius: 10px;
-    width: 60%;
-    max-width: 700px;
-    height: 500px; /* Fixed height */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-}
-
-/* Scrollable section inside the recipe container */
-#saved-recipes {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* Individual recipe box */
-.recipe-box {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
-    line-height: 1.6;
-    word-wrap: break-word;
-}
-
-/* Scrollbar customization */
-#saved-recipes::-webkit-scrollbar {
-    width: 8px;
-}
-
-#saved-recipes::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
-}
-
-#saved-recipes::-webkit-scrollbar-track {
-    background-color: #f4f4f4;
-}
-
-
-/* Scrollbar customization */
-#saved-recipes::-webkit-scrollbar {
-    width: 8px;
-}
-
-#saved-recipes::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 10px;
-}
-
-#saved-recipes::-webkit-scrollbar-track {
-    background-color: #f4f4f4;
-}
-
-.home-btn {
-    left: 20px;
-}
-
-.logout-btn {
-    right: 20px;
-}
-
-.home-btn:hover, .logout-btn:hover {
-    background: #246b43;
+.auth-container button:hover, .recipe-container button:hover {
+    background-color: #246b43; /* Changed hover color to green */
 }
