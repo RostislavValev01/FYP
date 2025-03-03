@@ -7,14 +7,21 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+    <nav class="navbar">
+        <a href="index.html" class="logo">AI Chef Buddy</a>
+        <div class="nav-links">
+            <a href="recipes.html" class="nav-btn">My Recipes</a>
+            <button id="logout-btn" class="nav-btn">Log Out</button>
+           
+        </div>
+    </nav>
     <!-- Title Box -->
     <div class="account-title-box">
         <h2>My Account</h2>
         <p>Welcome chef! This is your account dashboard.</p>
     </div>
 
-    <a href="index.html" class="home-btn">Home</a>
+    
 
     <div class="account-container">
         <h2>Account Information</h2>
@@ -29,8 +36,6 @@
         <!-- Change Password Button -->
         <button id="change-password">Change Password</button>
         
-        <!-- Logout Button (Moved Below Change Password) -->
-        <button id="logout-btn">Log Out</button>
     </div>
 
     <script>
