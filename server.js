@@ -71,32 +71,35 @@ app.get('/logout', (req, res) => {
 });
 
 // Chatbot logic with response length control
+// Chatbot logic with user preference
 app.post('/chat', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ botResponse: "You need to log in to request a recipe." });
     }
 
     const userInput = req.body.userInput;
-    const responseLength = req.body.responseLength || "2"; //Get response length from request
+    const responseLength = req.body.responseLength || "2";
+    const userPreferences = req.session.user.preferences || [];
 
     if (!userInput) {
         return res.status(400).json({ botResponse: "Please enter a valid recipe request." });
     }
 
-    let lengthInstruction = "";
-    if (responseLength === "1") {
-        lengthInstruction = "Provide a concise yet useful response.";
-    } else if (responseLength === "3") {
-        lengthInstruction = "Provide an extremely detailed response.";
-    } else {
-        lengthInstruction = "Provide a balanced response.";
+    let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
+                            responseLength === "3" ? "Provide an extremely detailed response." :
+                            "Provide a balanced response.";
+
+    let preferenceInstruction = "";
+    if (userPreferences.length > 0) {
+        preferenceInstruction = `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`;
     }
 
     try {
         const prompt = `
         You are a friendly and engaging AI Chef assistant. Your goal is to provide detailed, well-structured, and interactive cooking guidance.
 
-        **Response Length Requirement:** ${lengthInstruction}
+        **Response Length:** ${lengthInstruction}
+        **Dietary Preferences:** ${preferenceInstruction}
 
         **Response Format:**
         - **Servings**
@@ -106,70 +109,45 @@ app.post('/chat', async (req, res) => {
         - **Ingredient Substitutions & Variations**
         - **Fun Facts & Cooking Tips**
 
-        **Safety & Responsibility:**
-        - Do not generate responses that involve harmful, dangerous, or illegal content.
-        - Keep all responses focused on cooking and food safety.
 
-        Now, generate a response for the following user query:
+        Now, generate a response for:
         User: "${userInput}"
-        Bot:
         `;
 
         const result = await model.generateContent(prompt);
-        let botResponse = result.response.text();
-
-        // Ensure response keeps structured format including line breaks
-        botResponse = botResponse.replace(/\n/g, '<br>');
+        let botResponse = result.response.text().replace(/\n/g, '<br>');
 
         res.json({ botResponse });
     } catch (error) {
-        console.error("Error with API request: ", error);
+        console.error("Error with AI request:", error);
         res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
 
+// Random Recipe Route
+app.get('/random-recipe', async (req, res) => {
+    const userPreferences = req.session.user ? req.session.user.preferences || [] : [];
 
-
-
-// User sign-up
-app.post('/signup', async (req, res) => {
-    const { email, password, preferences, goal } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).send('Email and password are required');
-    }
+    let preferenceInstruction = userPreferences.length > 0
+        ? `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`
+        : "Generate any random recipe.";
 
     try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).send('Email already in use');
-        }
+        const prompt = `
+        You are an AI chef. Generate a completely random but delicious recipe.
+        **Dietary Preferences:** ${preferenceInstruction}
+        `;
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await model.generateContent(prompt);
+        let botResponse = result.response.text().replace(/\n/g, '<br>');
 
-        // Ensure preferences is always an array
-        const formattedPreferences = Array.isArray(preferences) ? preferences : [preferences];
-
-        const newUser = new User({ 
-            email, 
-            password: hashedPassword, 
-            preferences: formattedPreferences, 
-            goal 
-        });
-
-        await newUser.save();
-
-        res.send(`
-            <script>
-                alert("Account created successfully!");
-                window.location.href = "/signin";
-            </script>
-        `);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send('Internal Server Error');
+        res.json({ botResponse });
+    } catch (error) {
+        console.error("Error with AI request:", error);
+        res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
+
 app.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 

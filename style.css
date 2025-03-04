@@ -265,8 +265,8 @@ button:hover {
 
 
 
-/* Green styling for Send and Save Recipe buttons */
-#send-btn, #save-recipe-btn {
+/* Green styling for Send, Save Recipe, and Random Recipe buttons */
+#send-btn, #save-recipe-btn, #random-recipe-btn {
     background-color: #2E8B57; /* Green background */
     color: white;
     padding: 12px 20px;
@@ -278,9 +278,10 @@ button:hover {
 }
 
 /* Hover effect */
-#send-btn:hover, #save-recipe-btn:hover {
+#send-btn:hover, #save-recipe-btn:hover, #random-recipe-btn:hover {
     background-color: #246b43; /* Darker green on hover */
 }
+
 
 /* Style for the Slider Container */
 .slider-container {
@@ -290,6 +291,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    
 }
 
 /* Title above slider */
