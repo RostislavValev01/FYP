@@ -1,5 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ✅ Check login status on page load
+    const randomRecipeBtn = document.getElementById("random-recipe-btn");
+    let isLoggedIn = false; // Track login status
+
+    // Check login status on page load
     fetch('/check-login')
         .then(response => response.json())
         .then(data => {
@@ -7,26 +10,21 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data.loggedIn) {
                 accountBtn.textContent = "My Account";
                 accountBtn.href = "account.html"; 
+                isLoggedIn = true; 
             } else {
                 accountBtn.textContent = "Sign In";
                 accountBtn.href = "signin.html"; 
+                isLoggedIn = false; 
+                randomRecipeBtn.disabled = true; 
+                 
             }
         })
         .catch(error => console.error("Error checking login status:", error));
 
-    // ✅ Capture the response length from the slider
-    const responseLengthSlider = document.getElementById("response-length");
-    let responseLength = responseLengthSlider.value; // Default value
-
-    // Update the response length value whenever the slider is changed
-    responseLengthSlider.addEventListener("input", function () {
-        responseLength = this.value;
-    });
-
-    // ✅ Store latest recipe for saving
+    //  Store latest recipe for saving
     let latestRecipe = "";
 
-    // ✅ Function to send message to chatbot
+    // Function to send message to chatbot
     function sendMessage() {
         let userInput = document.getElementById('user-input').value.trim();
         
@@ -44,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput, responseLength }),
+            body: JSON.stringify({ userInput }),
             credentials: 'include'
         })
         .then(response => response.json())
@@ -56,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             displayMessage(data.botResponse, 'bot');
-            latestRecipe = data.botResponse; // ✅ Store recipe for saving
+            latestRecipe = data.botResponse; // Store recipe for saving
         })
         .catch(error => {
             console.error("Error:", error);
@@ -65,8 +63,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ Function to get a random recipe
+    // Function to get a random recipe
     function fetchRandomRecipe() {
+        if (!isLoggedIn) {
+            alert("You must be logged in to generate a random recipe.");
+            return;
+        }
+
         displayMessage("Fetching a random recipe...", "bot");
 
         fetch("/random-recipe", {
@@ -76,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             displayMessage(data.botResponse, "bot");
-            latestRecipe = data.botResponse; // ✅ Store random recipe for saving
+            latestRecipe = data.botResponse; // Store random recipe for saving
         })
         .catch(error => {
             console.error("Error fetching random recipe:", error);
@@ -84,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ✅ Function to save the latest recipe
+    // Function to save the latest recipe
     function saveRecipe() {
         if (!latestRecipe || latestRecipe.trim() === "") {
             alert("No recipe to save.");
@@ -108,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error saving recipe:", error));
     }
 
-    // ✅ Display message function
+    // Display message function
     function displayMessage(message, sender) {
         const chatBox = document.getElementById('chat-box');
         const messageDiv = document.createElement('div');
@@ -119,8 +122,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return messageDiv;
     }
 
-    // ✅ Attach event listeners
+    // Attach event listeners
     document.getElementById('send-btn').addEventListener('click', sendMessage);
-    document.getElementById("random-recipe-btn").addEventListener("click", fetchRandomRecipe);
+    randomRecipeBtn.addEventListener("click", fetchRandomRecipe);
     document.getElementById("save-recipe-btn").addEventListener("click", saveRecipe);
 });
+
