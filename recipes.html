@@ -55,22 +55,46 @@
                     fetch('/get-recipes')
                         .then(response => response.json())
                         .then(data => {
-                            if (data.success) {
-                                const recipeContainer = document.getElementById("saved-recipes");
-                                recipeContainer.innerHTML = "";
-                                data.recipes.forEach(recipe => {
+                            if (!data.success || !data.recipes || data.recipes.length === 0) {
+                                document.getElementById("saved-recipes").innerHTML = "<p>No saved recipes found.</p>";
+                                return;
+                            }
+            
+                            const recipeContainer = document.getElementById("saved-recipes");
+                            recipeContainer.innerHTML = "";
+            
+                            data.recipes.forEach(recipe => {
+                                if (recipe.content) { 
+                                    let recipeLines = recipe.content.trim().split("\n"); 
+            
+                                    // Ensure at least one line exists
+                                    if (recipeLines.length === 0) return;
+            
+                                    // Extract title and remove markdown symbols (e.g., ## or **)
+                                    let title = recipeLines.shift().replace(/[#*]+/g, "").trim();
+                                    let uppercaseTitle = title.toUpperCase(); // Ensure only title is uppercase
+            
+                                    // Rebuild body and normalize case
+                                    let body = recipeLines.join("\n").trim();
+            
+                                    // Convert body to sentence case
+                                    body = body.toLowerCase().replace(/(^\w|\.\s*\w)/g, match => match.toUpperCase());
+            
+                                    // Create recipe box
                                     const recipeDiv = document.createElement("div");
                                     recipeDiv.classList.add("recipe-box");
-                                    recipeDiv.innerHTML = `<p>${recipe.content}</p>`;
+                                    recipeDiv.innerHTML = `<h3 class="recipe-title">${uppercaseTitle}</h3><p class="recipe-body">${body}</p>`;
                                     recipeContainer.appendChild(recipeDiv);
-                                });
-                            } else {
-                                document.getElementById("saved-recipes").innerHTML = "<p>No saved recipes.</p>";
-                            }
+                                }
+                            });
                         })
                         .catch(error => console.error("Error fetching recipes:", error));
                 });
             </script>
+            
+            
+            
+            
             
 
         </div>
