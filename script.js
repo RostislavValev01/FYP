@@ -23,17 +23,20 @@ document.addEventListener("DOMContentLoaded", function () {
         responseLength = this.value;
     });
 
+    // ✅ Store latest recipe for saving
+    let latestRecipe = "";
+
     // ✅ Function to send message to chatbot
     function sendMessage() {
         let userInput = document.getElementById('user-input').value.trim();
         
-        if (!userInput || userInput.length === 0) {
+        if (!userInput) {
             alert("Please enter a valid message.");
             return;
         }
 
         displayMessage(userInput, 'user');
-        document.getElementById('user-input').value = ""; // Clear input field
+        document.getElementById('user-input').value = "";
 
         const thinkingMessage = displayMessage("Thinking...", 'bot');
         thinkingMessage.id = "thinking-message";
@@ -41,20 +44,19 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userInput, responseLength }),  // ✅ Send response length to server
+            body: JSON.stringify({ userInput, responseLength }),
             credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {
             document.getElementById('thinking-message')?.remove();
-
-            if (!data.botResponse || data.botResponse.trim() === "") {
+            if (!data.botResponse.trim()) {
                 alert("No response received.");
                 return;
             }
 
             displayMessage(data.botResponse, 'bot');
-            latestRecipe = data.botResponse; // ✅ Correctly store the latest chatbot response
+            latestRecipe = data.botResponse; // ✅ Store recipe for saving
         })
         .catch(error => {
             console.error("Error:", error);
@@ -63,10 +65,27 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    // ✅ Function to get a random recipe
+    function fetchRandomRecipe() {
+        displayMessage("Fetching a random recipe...", "bot");
 
-    // ✅ Save Recipe Button Functionality
-    document.getElementById("save-recipe-btn").addEventListener("click", function () {
+        fetch("/random-recipe", {
+            method: "GET",
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            displayMessage(data.botResponse, "bot");
+            latestRecipe = data.botResponse; // ✅ Store random recipe for saving
+        })
+        .catch(error => {
+            console.error("Error fetching random recipe:", error);
+            displayMessage("Error fetching recipe. Try again.", "bot");
+        });
+    }
+
+    // ✅ Function to save the latest recipe
+    function saveRecipe() {
         if (!latestRecipe || latestRecipe.trim() === "") {
             alert("No recipe to save.");
             return;
@@ -87,43 +106,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         })
         .catch(error => console.error("Error saving recipe:", error));
-    });
+    }
+
+    // ✅ Display message function
+    function displayMessage(message, sender) {
+        const chatBox = document.getElementById('chat-box');
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', `${sender}-message`);
+        messageDiv.innerHTML = `<p>${message}</p>`;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return messageDiv;
+    }
+
+    // ✅ Attach event listeners
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById("random-recipe-btn").addEventListener("click", fetchRandomRecipe);
+    document.getElementById("save-recipe-btn").addEventListener("click", saveRecipe);
 });
-
-// ✅ Display message function
-function displayMessage(message, sender) {
-    const chatBox = document.getElementById('chat-box');
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', `${sender}-message`);
-    messageDiv.innerHTML = `<p>${message}</p>`;
-    chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-
-document.getElementById('send-btn').addEventListener('click', sendMessage);
-
-
-
-
-function displayMessage(message, sender) {
-    const chatBox = document.getElementById('chat-box');
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', `${sender}-message`);
-    messageDiv.innerHTML = `<p>${message}</p>`;
-    chatBox.appendChild(messageDiv);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    return messageDiv;
-}
-
-
-function displayMessage(message, sender) {
-    const chatBox = document.getElementById('chat-box');
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', `${sender}-message`);
-    messageDiv.innerHTML = `<p>${message}</p>`;
-    chatBox.appendChild(messageDiv);
-
-    chatBox.scrollTop = chatBox.scrollHeight;
-    return messageDiv;
-}
