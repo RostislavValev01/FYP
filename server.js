@@ -70,8 +70,7 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Chatbot logic with response length control
-// Chatbot logic with user preference
+
 app.post('/chat', async (req, res) => {
     if (!req.session.user) {
         return res.status(401).json({ botResponse: "You need to log in to request a recipe." });
@@ -242,12 +241,6 @@ app.post('/save-recipe', async (req, res) => {
         res.status(500).json({ success: false, message: "Error saving recipe." });
     }
 });
-
-
-
-
-
-
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);

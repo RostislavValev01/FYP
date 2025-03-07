@@ -72,7 +72,8 @@
             
                                     // Extract title and remove markdown symbols (e.g., ## or **)
                                     let title = recipeLines.shift().replace(/[#*]+/g, "").trim();
-                                    let uppercaseTitle = title.toUpperCase(); // Ensure only title is uppercase
+                                    let normalTitle = title; // Keep the title in normal text
+
             
                                     // Rebuild body and normalize case
                                     let body = recipeLines.join("\n").trim();
@@ -83,7 +84,8 @@
                                     // Create recipe box
                                     const recipeDiv = document.createElement("div");
                                     recipeDiv.classList.add("recipe-box");
-                                    recipeDiv.innerHTML = `<h3 class="recipe-title">${uppercaseTitle}</h3><p class="recipe-body">${body}</p>`;
+                                    recipeDiv.innerHTML = `<h3 class="recipe-title">${normalTitle}</h3><p class="recipe-body">${body}</p>`;
+
                                     recipeContainer.appendChild(recipeDiv);
                                 }
                             });

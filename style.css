@@ -217,7 +217,7 @@ button:hover {
 /* Recipe Title Styling */
 .recipe-title {
     font-size: 15px;
-    font-weight: bold;
+    font-weight: normal;
     margin-bottom: 10px;
     color: #000000; /* Match the theme */
 }
