@@ -8,6 +8,7 @@ const session = require('express-session');
 const path = require('path');
 const User = require('./models/User');
 const Recipe = require('./models/recipes');
+const Workplace = require('./models/Workplace');
 const app = express();
 const port = 3000;
 
@@ -32,7 +33,96 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }));
+app.get('/workplaces', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
 
+    try {
+        let workplaces = await Workplace.find({ user: req.session.user._id });
+
+        // ✅ If no workplaces exist, create one automatically
+        if (!workplaces || workplaces.length === 0) {
+            console.log("🚀 No workplaces found. Creating a new one...");
+            const newWorkplace = new Workplace({
+                user: req.session.user._id,
+                name: `Chat ${new Date().toLocaleString()}`,
+                messages: []
+            });
+            await newWorkplace.save();
+            workplaces = [newWorkplace]; // Assign the new workplace
+        }
+
+        res.json({ success: true, workplaces });
+    } catch (error) {
+        console.error("Error fetching workplaces:", error);
+        res.status(500).json({ success: false, message: "Error retrieving workplaces." });
+    }
+});
+
+
+
+
+// Create a new workplace (new chat session)
+app.post('/workplaces', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+
+    try {
+        console.log("🚀 Creating a new workplace for user:", req.session.user._id);
+        
+        const newWorkplace = new Workplace({
+            user: req.session.user._id,
+            name: `Chat ${new Date().toLocaleString()}`,
+            messages: [
+                { sender: "bot", text: "Hello! I'm your personal chef assistant, how can I help?" }
+            ]
+        });
+
+        await newWorkplace.save();
+        console.log("✅ Workplace successfully created:", newWorkplace);
+        
+        res.json({ success: true, workplace: newWorkplace });
+    } catch (error) {
+        console.error("🚨 Error creating workplace:", error);
+        res.status(500).json({ success: false, message: "Error creating workplace." });
+    }
+});
+
+
+
+// Get a specific workplace's chat history
+app.get('/workplaces/:id', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+
+    try {
+        const workplace = await Workplace.findOne({ _id: req.params.id, user: req.session.user._id });
+
+        if (!workplace) return res.status(404).json({ message: "Workplace not found" });
+
+        res.json({ success: true, workplace });
+    } catch (error) {
+        console.error("Error fetching workplace:", error);
+        res.status(500).json({ success: false, message: "Error retrieving workplace." });
+    }
+});
+
+// Save chat messages to a workplace
+app.post('/workplaces/:id/messages', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
+
+    try {
+        const { sender, text } = req.body;
+        const workplace = await Workplace.findOne({ _id: req.params.id, user: req.session.user._id });
+
+        if (!workplace) return res.status(404).json({ message: "Workplace not found" });
+
+        workplace.messages.push({ sender, text });
+        await workplace.save();
+
+        res.json({ success: true, workplace });
+    } catch (error) {
+        console.error("Error saving message:", error);
+        res.status(500).json({ success: false, message: "Error saving message." });
+    }
+});
 // Serve the sign-in page
 app.get('/signin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'signin.html'));
@@ -66,10 +156,14 @@ app.get('/logout', (req, res) => {
             console.error("Error logging out:", err);
             return res.status(500).json({ success: false, message: "Error logging out." });
         }
+
         res.json({ success: true, message: "Logged out successfully!" });
     });
 });
 
+
+
+const { ObjectId } = mongoose.Types;
 
 app.post('/chat', async (req, res) => {
     if (!req.session.user) {
@@ -79,27 +173,36 @@ app.post('/chat', async (req, res) => {
     const userInput = req.body.userInput;
     const responseLength = req.body.responseLength || "2";
     const userPreferences = req.session.user.preferences || [];
+    const workplaceId = req.body.workplaceId; // Get workplace ID
 
     if (!userInput) {
         return res.status(400).json({ botResponse: "Please enter a valid recipe request." });
     }
 
-    let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
-                            responseLength === "3" ? "Provide an extremely detailed response." :
-                            "Provide a balanced response.";
-
-    let preferenceInstruction = "";
-    if (userPreferences.length > 0) {
-        preferenceInstruction = `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`;
+    if (!workplaceId || !ObjectId.isValid(workplaceId)) {
+        return res.status(400).json({ botResponse: "Invalid Workplace ID." });
     }
 
     try {
-        const prompt = `
-        You are a friendly and engaging AI Chef assistant. Your goal is to provide detailed, well-structured, and interactive cooking guidance.
+        const workplace = await Workplace.findOne({ _id: new ObjectId(workplaceId), user: req.session.user._id });
 
+        if (!workplace) {
+            return res.status(404).json({ botResponse: "Workplace not found." });
+        }
+        let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
+                        responseLength === "3" ? "Provide an extremely detailed response." :
+                        "Provide a balanced response.";
+                        let preferenceInstruction = "";
+                        if (userPreferences.length > 0) {
+                            preferenceInstruction = `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`;
+                        }
+                    
+                       
+        const prompt = `
+
+        You are a friendly and engaging AI Chef assistant. Your goal is to provide detailed, well-structured, and interactive cooking guidance.
         **Response Length:** ${lengthInstruction}
         **Dietary Preferences:** ${preferenceInstruction}
-
         **Response Format:**
         - **Servings**
         - **Prep & Cook Time**
@@ -108,20 +211,41 @@ app.post('/chat', async (req, res) => {
         - **Ingredient Substitutions & Variations**
         - **Fun Facts & Cooking Tips**
 
-
         Now, generate a response for:
         User: "${userInput}"
         `;
 
+        console.log("Sending AI request...");
+
         const result = await model.generateContent(prompt);
+
+        if (!result || !result.response) {
+            console.error("AI Response is invalid:", result);
+            return res.status(500).json({ botResponse: "Error: AI did not return a valid response." });
+        }
+
         let botResponse = result.response.text().replace(/\n/g, '<br>');
 
+       // Ensure messages are only added if they are new
+if (!workplace.messages.some(m => m.text === userInput && m.sender === "user")) {
+    workplace.messages.push({ sender: "user", text: userInput });
+}
+if (!workplace.messages.some(m => m.text === botResponse && m.sender === "bot")) {
+    workplace.messages.push({ sender: "bot", text: botResponse });
+}
+
+await workplace.save();
+
+
         res.json({ botResponse });
+
     } catch (error) {
         console.error("Error with AI request:", error);
-        res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
+        res.status(500).json({ botResponse: "Error: AI processing failed. Try again later." });
     }
 });
+
+
 
 // Random Recipe Route
 app.get('/random-recipe', async (req, res) => {
