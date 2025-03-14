@@ -221,6 +221,64 @@ button:hover {
     margin-bottom: 10px;
     color: #000000; /* Match the theme */
 }
+/* Ensure button alignment */
+/* Ensure button alignment */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px; /* Consistent spacing */
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Tooltip button styling */
+.tooltip-button {
+    position: relative;
+    background-color: #2E8B57;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Tooltip Text */
+.tooltip-button .tooltip-text {
+    visibility: hidden;
+    width: 250px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 120%; /* Tooltip above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.2s ease-in-out;
+    font-size: 14px;
+    white-space: normal;
+    max-width: 250px;
+}
+
+/* Show Tooltip on Hover */
+.tooltip-button:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-5px);
+}
+
+/* Fix hover effect */
+.tooltip-button:hover {
+    background-color: #246b43;
+}
+
+
+
 
 /* Authentication and Recipe Pages */
 .auth-container,
