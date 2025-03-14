@@ -133,13 +133,16 @@ app.get('/get-recipes', async (req, res) => {
     }
 
     try {
-        const recipes = await Recipe.find({ user: req.session.user._id });
+        const recipes = await Recipe.find({ user: req.session.user._id }).sort({ createdAt: -1 });
+
         res.json({ success: true, recipes });
     } catch (error) {
         console.error("Error fetching recipes:", error);
         res.status(500).json({ success: false, message: "Error retrieving recipes." });
     }
 });
+
+
 
 // Check if user is logged in
 app.get('/check-login', (req, res) => {
@@ -346,15 +349,27 @@ app.post('/save-recipe', async (req, res) => {
         return res.status(401).json({ success: false, message: "You need to log in to save recipes." });
     }
 
-    const { recipeContent } = req.body;
+    const { recipeContent, workplaceId } = req.body;
 
     if (!recipeContent || recipeContent.trim() === "") {
         return res.status(400).json({ success: false, message: "Recipe content is required." });
     }
 
+    if (!workplaceId || !mongoose.Types.ObjectId.isValid(workplaceId)) {
+        return res.status(400).json({ success: false, message: "Invalid Workplace ID." });
+    }
+
     try {
+        // Ensure the workplace belongs to the logged-in user
+        const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
+
+        if (!workplace) {
+            return res.status(404).json({ success: false, message: "Workplace not found." });
+        }
+
         const newRecipe = new Recipe({
             user: req.session.user._id, 
+            workplace: workplaceId,  // Associate recipe with workplace
             content: recipeContent
         });
 
@@ -365,6 +380,7 @@ app.post('/save-recipe', async (req, res) => {
         res.status(500).json({ success: false, message: "Error saving recipe." });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
