@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
             accountBtn.textContent = "My Account";
             accountBtn.href = "account.html";
             isLoggedIn = true; 
+            fetchRecommendations();
 
             // ✅ Fetch workplaces when user logs in
             fetch('/workplaces', { method: "GET", credentials: "include" })
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
             accountBtn.textContent = "Sign In";
             accountBtn.href = "signin.html";
             isLoggedIn = false;
+            document.getElementById("recommendation-container").innerHTML = "<p>Login to see recommendations.</p>";
 
             // ✅ Clear workplaces on logout
             localStorage.removeItem("workplaces");
@@ -37,7 +39,39 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch(error => console.error("Error checking login status:", error));
 
-
+    function fetchRecommendations() {
+        fetch('/recipe-recommendations', {
+            method: "GET",
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success || !data.recommendations || data.recommendations.length === 0) {
+                document.getElementById("recommendation-container").innerHTML = "<p>No recommendations available.</p>";
+                return;
+            }
+    
+            const recommendationContainer = document.getElementById("recommendation-container");
+            recommendationContainer.innerHTML = ""; 
+    
+            data.recommendations.forEach(recipe => {
+                const recipeDiv = document.createElement("div");
+                recipeDiv.classList.add("recommendation-item");
+                recipeDiv.textContent = recipe;
+                
+                // Click to ask AI for this recipe
+                recipeDiv.addEventListener("click", function () {
+                    sendChatMessage(`Can you give me a recipe for ${recipe}?`, localStorage.getItem("activeWorkplace"));
+                });
+    
+                recommendationContainer.appendChild(recipeDiv);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching recommendations:", error);
+            document.getElementById("recommendation-container").innerHTML = "<p>Error loading recommendations.</p>";
+        });
+    }
     function switchWorkplace(workplaceId) {
         console.log("🔄 Switching to workplace:", workplaceId);
     
