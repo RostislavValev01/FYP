@@ -245,6 +245,33 @@ app.post('/chat', async (req, res) => {
 
 
 
+app.get('/recipe-recommendations', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "You need to log in to get recommendations." });
+    }
+
+    const userPreferences = req.session.user.preferences || [];
+
+    let preferenceInstruction = userPreferences.length > 0
+        ? `Generate 5 dish recommendations that follow these dietary preferences: ${userPreferences.join(", ")}.`
+        : "Generate 5 completely random dish recommendations.";
+
+    try {
+        const prompt = `You are a recipe recommendation AI. Based on the following preferences, suggest 10 dish names:
+        
+        **User Preferences:** ${preferenceInstruction}
+        
+        Provide only dish names, separated by commas.`;
+
+        const result = await model.generateContent(prompt);
+        let recommendations = result.response.text().split(",").map(name => name.trim());
+
+        res.json({ success: true, recommendations });
+    } catch (error) {
+        console.error("Error generating recommendations:", error);
+        res.status(500).json({ success: false, message: "Error generating recommendations." });
+    }
+});
 
 
 
