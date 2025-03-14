@@ -148,12 +148,13 @@ document.addEventListener("DOMContentLoaded", function () {
     
         const thinkingMessage = displayMessage("Thinking...", 'bot');
         thinkingMessage.id = "thinking-message";
+        
         const responseLength = document.getElementById("response-length").value;
+    
         fetch('/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userInput, workplaceId, responseLength }),
-
             credentials: 'include'
         })
         .then(response => response.json())
@@ -169,10 +170,8 @@ document.addEventListener("DOMContentLoaded", function () {
     
             displayMessage(data.botResponse, 'bot');
     
-           
-            
-        console.log(" Chat history is being saved by the server, no need to save it again in frontend.");
-
+            // ✅ Store the last recipe received
+            latestRecipe = data.botResponse;
         })
         .catch(error => {
             console.error("🚨 Error:", error);
@@ -180,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('thinking-message')?.remove();
         });
     }
+    
     
     const newChatBtn = document.getElementById("new-chat-btn");
 
@@ -221,29 +221,38 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Function to save the latest recipe
-    function saveRecipe() {
-        if (!latestRecipe || latestRecipe.trim() === "") {
-            alert("No recipe to save.");
-            return;
-        }
+    
+   // Function to save the latest recipe associated with the active workplace
+function saveRecipe() {
+    const workplaceId = localStorage.getItem("activeWorkplace");
 
-        fetch("/save-recipe", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ recipeContent: latestRecipe }),
-            credentials: "include"
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Recipe saved successfully!");
-            } else {
-                alert("Failed to save recipe. Please log in.");
-            }
-        })
-        .catch(error => console.error("Error saving recipe:", error));
+    if (!latestRecipe || latestRecipe.trim() === "") {
+        alert("No recipe to save.");
+        return;
     }
+
+    if (!workplaceId) {
+        alert("No active workplace selected. Please create or select a chat session.");
+        return;
+    }
+
+    fetch("/save-recipe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ recipeContent: latestRecipe, workplaceId }),
+        credentials: "include"
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Recipe saved successfully!");
+        } else {
+            alert("Failed to save recipe. Please log in.");
+        }
+    })
+    .catch(error => console.error("Error saving recipe:", error));
+}
+
 
     // Display message function
     function displayMessage(message, sender) {
