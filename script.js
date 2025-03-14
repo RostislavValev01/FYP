@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.loggedIn) {
             accountBtn.textContent = "My Account";
             accountBtn.href = "account.html";
+            isLoggedIn = true; 
 
             // ✅ Fetch workplaces when user logs in
             fetch('/workplaces', { method: "GET", credentials: "include" })
@@ -27,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             accountBtn.textContent = "Sign In";
             accountBtn.href = "signin.html";
+            isLoggedIn = false;
 
             // ✅ Clear workplaces on logout
             localStorage.removeItem("workplaces");
