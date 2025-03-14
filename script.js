@@ -109,6 +109,24 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("Error switching workplace:", error));
     }
     
+    function deleteWorkplace(workplaceId) {
+        if (!confirm("Are you sure you want to delete this chat? This cannot be undone.")) return;
+    
+        fetch(`/workplaces/${workplaceId}`, {
+            method: "DELETE",
+            credentials: "include"
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Chat deleted successfully!");
+                renderWorkplaces(); 
+            } else {
+                alert("Failed to delete chat.");
+            }
+        })
+        .catch(error => console.error("Error deleting workplace:", error));
+    }
     
 
     function renderWorkplaces() {
@@ -136,6 +154,16 @@ document.addEventListener("DOMContentLoaded", function () {
                     // ✅ Attach click event to switch workplaces
                     workplaceDiv.addEventListener("click", () => switchWorkplace(workplace._id));
     
+                    // ✅ Create Delete Button
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.classList.add("delete-workplace-btn");
+                    deleteBtn.textContent = "Remove";
+                    deleteBtn.addEventListener("click", (event) => {
+                        event.stopPropagation(); // Prevent switching chat
+                        deleteWorkplace(workplace._id);
+                    });
+    
+                    workplaceDiv.appendChild(deleteBtn); // Append delete button
                     workplacesContainer.appendChild(workplaceDiv);
                 });
     
@@ -147,6 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(error => console.error("Error fetching workplaces:", error));
     }
+    
     
     
     //  Store latest recipe for saving

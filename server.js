@@ -368,6 +368,22 @@ app.get('/account-data', async (req, res) => {
     }
 });
 
+app.delete('/workplaces/:id', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    try {
+        const workplace = await Workplace.findOneAndDelete({ _id: req.params.id, user: req.session.user._id });
+
+        if (!workplace) {
+            return res.status(404).json({ success: false, message: "Workplace not found." });
+        }
+
+        res.json({ success: true, message: "Workplace deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting workplace:", error);
+        res.status(500).json({ success: false, message: "Error deleting workplace." });
+    }
+});
 
 app.post('/save-recipe', async (req, res) => {
     if (!req.session.user || !req.session.user._id) {
