@@ -42,9 +42,21 @@
             <label>Response Length</label>
             <input type="range" id="response-length" min="1" max="3" step="1" value="2">
         </div>
-        <button id="send-btn">Send</button>
-        <button id="random-recipe-btn">Random Recipe</button>
-        <button id="save-recipe-btn">Save Recipe</button>
+        
+        <div class="button-container">
+            <button id="send-btn">Send</button>
+            <button id="random-recipe-btn">Random Recipe</button>
+        
+            <!-- Save Recipe Button with Tooltip -->
+            <button id="save-recipe-btn" class="tooltip-button">
+                Save Recipe
+                <span class="tooltip-text">You can only save newly requested recipes to your account.</span>
+            </button>
+        </div>
+        
+
+        
+
     </div>
     
     <script src="script.js"></script>
