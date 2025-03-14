@@ -176,49 +176,50 @@ app.post('/chat', async (req, res) => {
     const userInput = req.body.userInput;
     const responseLength = req.body.responseLength || "2";
     const userPreferences = req.session.user.preferences || [];
-    const workplaceId = req.body.workplaceId; // Get workplace ID
+    const workplaceId = req.body.workplaceId; 
 
     if (!userInput) {
-        return res.status(400).json({ botResponse: "Please enter a valid recipe request." });
+        return res.status(400).json({ botResponse: "Please enter a valid question or request." });
     }
 
-    if (!workplaceId || !ObjectId.isValid(workplaceId)) {
+    if (!workplaceId || !mongoose.Types.ObjectId.isValid(workplaceId)) {
         return res.status(400).json({ botResponse: "Invalid Workplace ID." });
     }
 
     try {
-        const workplace = await Workplace.findOne({ _id: new ObjectId(workplaceId), user: req.session.user._id });
+        const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
 
         if (!workplace) {
             return res.status(404).json({ botResponse: "Workplace not found." });
         }
+
+        // ✅ Retrieve the last 5 messages from the conversation
+        const recentMessages = workplace.messages.slice(-5).map(msg => `${msg.sender === "user" ? "User" : "Bot"}: ${msg.text}`).join("\n");
+
         let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
                         responseLength === "3" ? "Provide an extremely detailed response." :
                         "Provide a balanced response.";
-                        let preferenceInstruction = "";
-                        if (userPreferences.length > 0) {
-                            preferenceInstruction = `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`;
-                        }
-                    
-                       
-        const prompt = `
 
-        You are a friendly and engaging AI Chef assistant. Your goal is to provide detailed, well-structured, and interactive cooking guidance.
+        let preferenceInstruction = userPreferences.length > 0 ? `Ensure the recipe follows these dietary preferences: ${userPreferences.join(", ")}.` : "";
+
+        // ✅ Pass recent conversation history as context
+        const prompt = `
+        You are a friendly and engaging AI Chef assistant. You are in an ongoing conversation with the user. 
+        Maintain continuity and answer follow-up questions accurately based on previous responses.
+
+        **Conversation History:**
+        ${recentMessages}
+
+        **User's New Message:**
+        "${userInput}"
+
         **Response Length:** ${lengthInstruction}
         **Dietary Preferences:** ${preferenceInstruction}
-        **Response Format:**
-        - **Servings**
-        - **Prep & Cook Time**
-        - **Ingredients**
-        - **Instructions**
-        - **Ingredient Substitutions & Variations**
-        - **Fun Facts & Cooking Tips**
 
-        Now, generate a response for:
-        User: "${userInput}"
+        Respond in a helpful, clear, and friendly manner.
         `;
 
-        console.log("Sending AI request...");
+        console.log("🚀 Sending AI request with context...");
 
         const result = await model.generateContent(prompt);
 
@@ -229,16 +230,10 @@ app.post('/chat', async (req, res) => {
 
         let botResponse = result.response.text().replace(/\n/g, '<br>');
 
-       // Ensure messages are only added if they are new
-if (!workplace.messages.some(m => m.text === userInput && m.sender === "user")) {
-    workplace.messages.push({ sender: "user", text: userInput });
-}
-if (!workplace.messages.some(m => m.text === botResponse && m.sender === "bot")) {
-    workplace.messages.push({ sender: "bot", text: botResponse });
-}
-
-await workplace.save();
-
+        // ✅ Add user message & AI response to workplace history
+        workplace.messages.push({ sender: "user", text: userInput });
+        workplace.messages.push({ sender: "bot", text: botResponse });
+        await workplace.save();
 
         res.json({ botResponse });
 
@@ -247,6 +242,9 @@ await workplace.save();
         res.status(500).json({ botResponse: "Error: AI processing failed. Try again later." });
     }
 });
+
+
+
 
 
 

@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
             displayMessage(data.botResponse, 'bot');
     
-            // ✅ Store the last recipe received
+            // ✅ Store the last bot message for context
             latestRecipe = data.botResponse;
         })
         .catch(error => {
@@ -181,6 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('thinking-message')?.remove();
         });
     }
+    
     
     
     const newChatBtn = document.getElementById("new-chat-btn");
