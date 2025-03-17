@@ -376,6 +376,41 @@ function createNewWorkplace() {
 }
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    const changePasswordForm = document.getElementById("change-password-form");
+
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const oldPassword = document.getElementById("old-password").value;
+            const newPassword = document.getElementById("new-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
+
+            if (newPassword !== confirmPassword) {
+                alert("New passwords do not match!");
+                return;
+            }
+
+            fetch("/change-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ oldPassword, newPassword }),
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Password changed successfully!");
+                    window.location.href = "account.html";
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error changing password:", error));
+        });
+    }
+});
 
 
 document.addEventListener("DOMContentLoaded", function () {

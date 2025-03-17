@@ -384,6 +384,24 @@ app.delete('/workplaces/:id', async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting workplace." });
     }
 });
+app.delete('/delete-recipe/:id', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    try {
+        const recipe = await Recipe.findOneAndDelete({ _id: req.params.id, user: req.session.user._id });
+
+        if (!recipe) {
+            return res.status(404).json({ success: false, message: "Recipe not found." });
+        }
+
+        res.json({ success: true, message: "Recipe deleted successfully." });
+    } catch (error) {
+        console.error("Error deleting recipe:", error);
+        res.status(500).json({ success: false, message: "Error deleting recipe." });
+    }
+});
 
 app.post('/save-recipe', async (req, res) => {
     if (!req.session.user || !req.session.user._id) {
@@ -422,6 +440,38 @@ app.post('/save-recipe', async (req, res) => {
     }
 });
 
+app.get('/passwordchange', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'passwordchange.html'));
+});
+
+app.post('/change-password', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        const user = await User.findById(req.session.user._id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Incorrect old password" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ success: true, message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error updating password:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
