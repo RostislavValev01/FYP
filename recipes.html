@@ -31,26 +31,38 @@
                         document.getElementById("saved-recipes").innerHTML = "<p>No saved recipes found.</p>";
                         return;
                     }
-    
+        
                     const recipeContainer = document.getElementById("saved-recipes");
                     recipeContainer.innerHTML = "";
-    
+        
                     data.recipes.forEach(recipe => {
                         if (recipe.content) {
                             let recipeLines = recipe.content.trim().split("\n");
-    
+        
                             if (recipeLines.length === 0) return;
-    
+        
                             let title = recipeLines.shift().replace(/[#*]+/g, "").trim();
                             let body = recipeLines.join("\n").trim();
                             body = body.toLowerCase().replace(/(^\w|\.\s*\w)/g, match => match.toUpperCase());
-    
+        
                             const recipeDiv = document.createElement("div");
                             recipeDiv.classList.add("recipe-box");
-                            recipeDiv.innerHTML = `<h3 class="recipe-title">${title}</h3><p class="recipe-body">${body}</p>`;
-    
+                            recipeDiv.innerHTML = `
+                                <button class="delete-recipe-btn" data-id="${recipe._id}">Remove this recipe</button>
+                                <h3 class="recipe-title">${title}</h3>
+                                <p class="recipe-body">${body}</p>
+                            `;
+        
                             recipeContainer.appendChild(recipeDiv);
                         }
+                    });
+        
+                    // Attach delete event listeners
+                    document.querySelectorAll(".delete-recipe-btn").forEach(button => {
+                        button.addEventListener("click", function () {
+                            const recipeId = this.dataset.id;
+                            deleteRecipe(recipeId);
+                        });
                     });
                 })
                 .catch(error => {
@@ -58,7 +70,28 @@
                     document.getElementById("saved-recipes").innerHTML = "<p>Error loading recipes. Try again later.</p>";
                 });
         });
-    </script>
+        
+        function deleteRecipe(recipeId) {
+            if (!confirm("Are you sure you want to delete this recipe? This cannot be undone.")) return;
+        
+            fetch(`/delete-recipe/${recipeId}`, {
+                method: "DELETE",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Recipe deleted successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to delete recipe.");
+                }
+            })
+            .catch(error => console.error("Error deleting recipe:", error));
+        }
+        </script>
+        
+    
     
 
     <script src="script.js"></script>

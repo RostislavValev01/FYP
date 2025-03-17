@@ -522,3 +522,24 @@ button:hover {
 .delete-workplace-btn:hover {
     color: darkred;
 }
+
+/* Recipe Box */
+.recipe-box {
+    background: #e1f7d5;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* Change Password Button - Remove Underline */
+#change-password {
+    display: block; /* Ensure it's on a new line */
+    margin: 20px auto; /* Adds space above and below */
+    text-align: center; /* Center it */
+    width: fit-content; /* Prevent it from stretching */
+    text-decoration: none; /* Removes the underline */
+    font-weight: bold; /* Keep it looking strong */
+    color: white; /* Ensure text stays white */
+}
