@@ -54,18 +54,45 @@ document.addEventListener("DOMContentLoaded", function () {
             const recommendationContainer = document.getElementById("recommendation-container");
             recommendationContainer.innerHTML = ""; 
     
-            data.recommendations.forEach(recipe => {
-                const recipeDiv = document.createElement("div");
-                recipeDiv.classList.add("recommendation-item");
-                recipeDiv.textContent = recipe;
-                
-                // Click to ask AI for this recipe
-                recipeDiv.addEventListener("click", function () {
-                    sendChatMessage(`Can you give me a recipe for ${recipe}?`, localStorage.getItem("activeWorkplace"));
-                });
-    
-                recommendationContainer.appendChild(recipeDiv);
-            });
+            const shownRecipes = new Set(); // Track recipes shown
+
+data.recommendations.forEach(recipe => {
+    shownRecipes.add(recipe); // Mark it as shown
+
+    const recipeDiv = document.createElement("div");
+    recipeDiv.classList.add("recommendation-item");
+    recipeDiv.textContent = recipe;
+
+    recipeDiv.addEventListener("click", function () {
+        sendChatMessage(`Can you give me a recipe for ${this.textContent}?`, localStorage.getItem("activeWorkplace"));
+
+
+        // Replace with a new one
+        fetch("/recipe-recommendations", {
+            method: "GET",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(fresh => {
+            if (fresh.success && fresh.recommendations) {
+                // Find a recipe not already shown
+                const newRecipe = fresh.recommendations.find(r => !shownRecipes.has(r));
+                if (newRecipe) {
+                    shownRecipes.add(newRecipe);
+                    this.textContent = newRecipe;
+                } else {
+                    this.remove(); // Fallback: remove if no more unique recipes
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Error replacing recommendation:", err);
+        });
+    });
+
+    recommendationContainer.appendChild(recipeDiv);
+});
+
         })
         .catch(error => {
             console.error("Error fetching recommendations:", error);
@@ -164,6 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
                        
 
                     });
+                    
                      // Create Edit Button
 const editBtn = document.createElement("button");
 editBtn.classList.add("edit-workplace-btn");
