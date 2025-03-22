@@ -586,3 +586,7 @@ button:hover {
 .edit-workplace-btn:hover {
     color: darkblue;
 }
+.recommendation-item {
+    transition: background 0.3s, opacity 0.3s;
+}
+
