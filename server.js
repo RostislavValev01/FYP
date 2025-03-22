@@ -391,6 +391,56 @@ app.post('/signin', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+app.post('/signup', async (req, res) => {
+    const { email, password, ['confirm-password']: confirmPassword, preferences, goal } = req.body;
+
+    if (!email || !password || !confirmPassword) {
+        return res.status(400).send("All fields are required.");
+    }
+
+    if (password !== confirmPassword) {
+        return res.status(400).send("Passwords do not match.");
+    }
+
+    try {
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).send("Email already in use.");
+        }
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Store preferences as array (checkboxes can return a string or array)
+        const formattedPreferences = Array.isArray(preferences)
+            ? preferences
+            : preferences ? [preferences] : [];
+
+        // Create and save new user
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            preferences: formattedPreferences,
+            goal
+        });
+
+        await newUser.save();
+
+        // Set session after signup
+        req.session.user = {
+            _id: newUser._id,
+            email: newUser.email,
+            preferences: newUser.preferences,
+            goal: newUser.goal
+        };
+
+        res.redirect('/index.html'); // Redirect to home or dashboard
+    } catch (error) {
+        console.error("Signup error:", error);
+        res.status(500).send("Internal Server Error.");
+    }
+});
 
 // Restrict access to recipes page
 app.get('/check-login', (req, res) => {
