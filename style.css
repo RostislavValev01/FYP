@@ -543,3 +543,14 @@ button:hover {
     font-weight: bold; /* Keep it looking strong */
     color: white; /* Ensure text stays white */
 }
+
+.edit-workplace-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.edit-workplace-btn:hover {
+    color: darkblue;
+}

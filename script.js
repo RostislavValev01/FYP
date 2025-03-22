@@ -161,9 +161,42 @@ document.addEventListener("DOMContentLoaded", function () {
                     deleteBtn.addEventListener("click", (event) => {
                         event.stopPropagation(); // Prevent switching chat
                         deleteWorkplace(workplace._id);
+                       
+
                     });
-    
+                     // Create Edit Button
+const editBtn = document.createElement("button");
+editBtn.classList.add("edit-workplace-btn");
+editBtn.textContent = "Edit";
+editBtn.style.color = "blue";
+editBtn.style.marginLeft = "10px";
+
+editBtn.addEventListener("click", (event) => {
+    event.stopPropagation(); // Avoid triggering chat switch
+    const newName = prompt("Enter a new name for this chat:", workplace.name);
+    if (newName && newName.trim().length > 1) {
+        fetch(`/workplaces/${workplace._id}/rename`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newName }),
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderWorkplaces(); // Refresh list
+            } else {
+                alert("Failed to rename chat.");
+            }
+        })
+        .catch(err => {
+            console.error("Rename error:", err);
+            alert("Rename failed.");
+        });
+    }
+});
                     workplaceDiv.appendChild(deleteBtn); // Append delete button
+                    workplaceDiv.appendChild(editBtn); // Append edit button
                     workplacesContainer.appendChild(workplaceDiv);
                 });
     
