@@ -13,16 +13,16 @@ document.addEventListener("DOMContentLoaded", function () {
             isLoggedIn = true; 
             fetchRecommendations();
 
-            // ✅ Fetch workplaces when user logs in
+            // Fetch workplaces when user logs in
             fetch('/workplaces', { method: "GET", credentials: "include" })
                 .then(response => response.json())
                 .then(workspaceData => {
                     if (workspaceData.success && workspaceData.workplaces.length > 0) {
                         localStorage.setItem("workplaces", JSON.stringify(workspaceData.workplaces));
-                        renderWorkplaces(); // ✅ Refresh UI
+                        renderWorkplaces(); //Refresh UI
                         switchWorkplace(workspaceData.workplaces[0]._id); // Auto-switch to first workplace
                     } else {
-                        console.log("🚀 No workplaces found. Creating a new one...");
+                        console.log("No workplaces found. Creating a new one...");
                         createNewWorkplace();
                     }
                 });
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isLoggedIn = false;
             document.getElementById("recommendation-container").innerHTML = "<p>Login to see recommendations.</p>";
 
-            // ✅ Clear workplaces on logout
+            // Clear workplaces on logout
             localStorage.removeItem("workplaces");
             localStorage.removeItem("activeWorkplace");
         }
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
     function switchWorkplace(workplaceId) {
-        console.log("🔄 Switching to workplace:", workplaceId);
+        console.log("Switching to workplace:", workplaceId);
     
         fetch(`/workplaces/${workplaceId}`, {
             method: "GET",
@@ -86,18 +86,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
     
-            // ✅ Store the selected workplace in localStorage
+            // Store the selected workplace in localStorage
             localStorage.setItem("activeWorkplace", workplaceId);
     
-            // ✅ Clear the chat box before adding new messages
+            // Clear the chat box before adding new messages
             const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML = ""; // ✅ Prevent duplicate messages
+            chatBox.innerHTML = ""; // Prevent duplicate messages
     
             data.workplace.messages.forEach(msg => {
                 displayMessage(msg.text, msg.sender);
             });
     
-            // ✅ Update UI: Highlight selected workplace
+            // Update UI: Highlight selected workplace
             document.querySelectorAll(".workplace-item").forEach(item => {
                 item.classList.remove("active-workplace"); // Remove highlight from all
                 if (item.dataset.id === workplaceId) {
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 workplacesContainer.innerHTML = ""; // Clear previous workplaces
     
                 if (data.workplaces.length === 0) {
-                    console.log("🚀 No workplaces found. Creating a new one...");
+                    console.log("No workplaces found. Creating a new one...");
                     createNewWorkplace();
                     return;
                 }
@@ -151,10 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     workplaceDiv.textContent = workplace.name;
                     workplaceDiv.dataset.id = workplace._id;
     
-                    // ✅ Attach click event to switch workplaces
+                    // Attach click event to switch workplaces
                     workplaceDiv.addEventListener("click", () => switchWorkplace(workplace._id));
     
-                    // ✅ Create Delete Button
+                    // Create Delete Button
                     const deleteBtn = document.createElement("button");
                     deleteBtn.classList.add("delete-workplace-btn");
                     deleteBtn.textContent = "Remove";
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     workplacesContainer.appendChild(workplaceDiv);
                 });
     
-                // ✅ Automatically switch to the first available workplace if none is selected
+                // Automatically switch to the first available workplace if none is selected
                 if (!localStorage.getItem("activeWorkplace") && data.workplaces.length > 0) {
                     switchWorkplace(data.workplaces[0]._id);
                 }
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         // ✅ If no active chat session, create a new one before sending the message
         if (!workplaceId) {
-            console.log("🚀 No active chat session found. Creating a new one...");
+            console.log("No active chat session found. Creating a new one...");
             createNewWorkplace((newWorkplaceId) => {
                 sendChatMessage(userInput, newWorkplaceId);
             });
@@ -204,9 +204,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
     
-    // ✅ Helper function to send messages
+    // Helper function to send messages
     function sendChatMessage(userInput, workplaceId) {
-        console.log("📢 Sending chat request with workplaceId:", workplaceId);
+        console.log("Sending chat request with workplaceId:", workplaceId);
     
         displayMessage(userInput, 'user');
         document.getElementById('user-input').value = "";
@@ -226,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             document.getElementById('thinking-message')?.remove();
     
-            console.log("📢 Chatbot Response:", data.botResponse);
+            console.log("Chatbot Response:", data.botResponse);
     
             if (!data.botResponse.trim()) {
                 alert("No response received.");
@@ -235,11 +235,11 @@ document.addEventListener("DOMContentLoaded", function () {
     
             displayMessage(data.botResponse, 'bot');
     
-            // ✅ Store the last bot message for context
+            // Store the last bot message for context
             latestRecipe = data.botResponse;
         })
         .catch(error => {
-            console.error("🚨 Error:", error);
+            console.error("Error:", error);
             displayMessage("Sorry, something went wrong.", 'bot');
             document.getElementById('thinking-message')?.remove();
         });
@@ -253,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     newChatBtn.addEventListener("click", function () {
-        console.log("🆕 'Create New Chat' button clicked!");
+        console.log("'Create New Chat' button clicked!");
         createNewWorkplace();
     });
     
@@ -333,21 +333,29 @@ function saveRecipe() {
 
     // Attach event listeners
     const sendButton = document.getElementById("send-btn");
+    const userInputField = document.getElementById("user-input");
 
+    userInputField.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault(); // Prevent newline
+            sendMessage();          // Trigger send
+        }
+    });
+    
 if (sendButton) {
     sendButton.addEventListener("click", function () {
-        console.log("📩 Send button clicked!");
+        console.log("Send button clicked!");
         sendMessage();
     });
 } else {
-    console.error("🚨 'Send' button not found in DOM.");
+    console.error("'Send' button not found in DOM.");
 }
 
     randomRecipeBtn.addEventListener("click", fetchRandomRecipe);
     document.getElementById("save-recipe-btn").addEventListener("click", saveRecipe);
 });
 function createNewWorkplace() {
-    console.log("🚀 Creating a new workplace...");
+    console.log("Creating a new workplace...");
 
     fetch('/workplaces', {
         method: 'POST',
@@ -356,21 +364,21 @@ function createNewWorkplace() {
     })
     .then(response => response.json())
     .then(data => {
-        if (!data.success || !data.workplace) { // ✅ Only refresh if creation was successful
-            console.error("🚨 API Error: Failed to create a workplace:", data);
+        if (!data.success || !data.workplace) { //  Only refresh if creation was successful
+            console.error("API Error: Failed to create a workplace:", data);
             alert("Error creating a chat session. Please try again.");
             return;
         }
 
-        console.log("✅ New workplace created:", data.workplace);
+        console.log(" New workplace created:", data.workplace);
 
-        // ✅ Force a page reload after chat creation
+        //  Force a page reload after chat creation
         setTimeout(() => {
             window.location.reload();
         }, 500);
     })
     .catch(error => {
-        console.error("🚨 Network Error: Could not create a workplace:", error);
+        console.error("Network Error: Could not create a workplace:", error);
         alert("Error creating a chat session.");
     });
 }
@@ -419,18 +427,17 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(data => {
         if (data.success) {
             localStorage.setItem("workplaces", JSON.stringify(data.workplaces));
-            renderWorkplaces(); // ✅ Ensure UI updates
+            renderWorkplaces(); //  Ensure UI updates
             if (data.workplaces.length > 0) {
                 switchWorkplace(data.workplaces[0]._id);
             } else {
-                console.log("🚀 No workplaces found. Click 'Create New Chat' to start.");
+                console.log("No workplaces found. Click 'Create New Chat' to start.");
             }
             
         }
     })
     .catch(error => console.error("Error fetching workplaces on load:", error));
 });
-
 
 
 
