@@ -96,34 +96,59 @@ body {
     
 }
 
-/* User Messages */
 .user-message {
-    background-color: #d1e8ff;
+    background-color: #d1e8ff; 
+    color: #000;              
     align-self: flex-end;
-    padding: 12px 15px;
-    border-radius: 8px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    font-family: "Arial", "Verdana", "Tahoma", sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    word-break: break-word;
+    box-shadow: 1px 1px 6px rgba(0,0,0,0.05);
 }
 
-/* Bot Messages */
+
 .bot-message {
-    background-color: #e1f7d5;
+    background-color: #e1f7d5; 
+    color: #222;               
     align-self: flex-start;
-    padding: 12px 15px;
-    border-radius: 8px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    font-family: "Arial", "Verdana", "Tahoma", sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    word-break: break-word;
+    box-shadow: 1px 1px 6px rgba(0,0,0,0.05);
 }
 
-/* Text Input */
+
 textarea {
     width: 95%;
-    height: 60px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    margin: 10px auto;
-    font-size: 16px;
+    height: 70px;
+    padding: 14px 16px;
+    border: 2px solid #2E8B57; 
+    border-radius: 10px;
+    margin: 12px auto;
+    font-size: 18px;
+    font-family: "Arial", "Verdana", "Tahoma", sans-serif;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    color: #000;
     resize: none;
-    box-sizing: border-box;
+    box-shadow: 1px 1px 6px rgba(0,0,0,0.05);
+    background-color: #fff;
 }
+textarea:focus {
+    outline: none;
+    border-color: #246b43;
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.3);
+}
+
+
 /* Account Page Container */
 .account-container {
     background: white; /* White background */
@@ -525,13 +550,20 @@ button:hover {
 
 /* Recipe Box */
 .recipe-box {
-    background: #e1f7d5;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
+    background-color: #e1f7d5;
+    color: #222;
+    padding: 20px 24px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    font-family: "Arial", "Verdana", "Tahoma", sans-serif;
+    font-size: 20px; /* ↑ Increased from 18px */
+    line-height: 1.8; /* ↑ Slightly more spaced */
+    letter-spacing: 0.4px;
+    word-break: break-word;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.05);
 }
+
+
 
 /* Change Password Button - Remove Underline */
 #change-password {
