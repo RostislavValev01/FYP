@@ -39,9 +39,9 @@ app.get('/workplaces', async (req, res) => {
     try {
         let workplaces = await Workplace.find({ user: req.session.user._id });
 
-        // ✅ If no workplaces exist, create one automatically
+        // If no workplaces exist, create one automatically
         if (!workplaces || workplaces.length === 0) {
-            console.log("🚀 No workplaces found. Creating a new one...");
+            console.log("No workplaces found. Creating a new one...");
             const newWorkplace = new Workplace({
                 user: req.session.user._id,
                 name: `Chat ${new Date().toLocaleString()}`,
@@ -66,7 +66,7 @@ app.post('/workplaces', async (req, res) => {
     if (!req.session.user) return res.status(401).json({ message: "Unauthorized" });
 
     try {
-        console.log("🚀 Creating a new workplace for user:", req.session.user._id);
+        console.log("Creating a new workplace for user:", req.session.user._id);
         
         const newWorkplace = new Workplace({
             user: req.session.user._id,
@@ -77,11 +77,11 @@ app.post('/workplaces', async (req, res) => {
         });
 
         await newWorkplace.save();
-        console.log("✅ Workplace successfully created:", newWorkplace);
+        console.log("Workplace successfully created:", newWorkplace);
         
         res.json({ success: true, workplace: newWorkplace });
     } catch (error) {
-        console.error("🚨 Error creating workplace:", error);
+        console.error("Error creating workplace:", error);
         res.status(500).json({ success: false, message: "Error creating workplace." });
     }
 });
@@ -193,7 +193,7 @@ app.post('/chat', async (req, res) => {
             return res.status(404).json({ botResponse: "Workplace not found." });
         }
 
-        // ✅ Retrieve the last 5 messages from the conversation
+        // Retrieve the last 5 messages from the conversation
         const recentMessages = workplace.messages.slice(-5).map(msg => `${msg.sender === "user" ? "User" : "Bot"}: ${msg.text}`).join("\n");
 
         let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
@@ -202,7 +202,7 @@ app.post('/chat', async (req, res) => {
 
         let preferenceInstruction = userPreferences.length > 0 ? `Ensure the recipe follows these dietary preferences: ${userPreferences.join(", ")}.` : "";
 
-        // ✅ Pass recent conversation history as context
+        //Pass recent conversation history as context
         const prompt = `
         You are a friendly and engaging AI Chef assistant. You are in an ongoing conversation with the user. 
         Maintain continuity and answer follow-up questions accurately based on previous responses.
@@ -219,7 +219,7 @@ app.post('/chat', async (req, res) => {
         Respond in a helpful, clear, and friendly manner.
         `;
 
-        console.log("🚀 Sending AI request with context...");
+        console.log("Sending AI request with context...");
 
         const result = await model.generateContent(prompt);
 
@@ -230,10 +230,42 @@ app.post('/chat', async (req, res) => {
 
         let botResponse = result.response.text().replace(/\n/g, '<br>');
 
-        // ✅ Add user message & AI response to workplace history
-        workplace.messages.push({ sender: "user", text: userInput });
-        workplace.messages.push({ sender: "bot", text: botResponse });
-        await workplace.save();
+      // Add user and bot messages
+workplace.messages.push({ sender: "user", text: userInput });
+workplace.messages.push({ sender: "bot", text: botResponse });
+
+// If this is the first actual user message (after intro)
+if (workplace.messages.length === 3) {
+    // Generate a smart title using AI
+    const titlePrompt = `
+    You are an assistant summarizing user messages for chat titles.
+    Extract a short, clear, and descriptive title from this message:
+    
+    "${userInput}"
+
+    Only return the title. Do not include extra text.
+    `;
+
+    try {
+        const titleResult = await model.generateContent(titlePrompt);
+        let newTitle = titleResult.response.text().trim();
+
+        // Sanitize and fallback
+        if (!newTitle || newTitle.length < 3) {
+            newTitle = userInput.slice(0, 40);
+        }
+
+        workplace.name = newTitle;
+    } catch (err) {
+        console.error("Error generating smart title:", err);
+        workplace.name = userInput.slice(0, 40);
+    }
+}
+
+
+await workplace.save();
+
+
 
         res.json({ botResponse });
 

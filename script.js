@@ -234,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
     
             displayMessage(data.botResponse, 'bot');
-    
+            renderWorkplaces();
             // Store the last bot message for context
             latestRecipe = data.botResponse;
         })
