@@ -262,6 +262,33 @@ if (workplace.messages.length === 3) {
     }
 }
 
+// Update workplace name
+app.put('/workplaces/:id/rename', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const { newName } = req.body;
+
+    if (!newName || newName.trim().length < 2) {
+        return res.status(400).json({ success: false, message: "Name too short." });
+    }
+
+    try {
+        const workplace = await Workplace.findOneAndUpdate(
+            { _id: req.params.id, user: req.session.user._id },
+            { name: newName.trim() },
+            { new: true }
+        );
+
+        if (!workplace) {
+            return res.status(404).json({ success: false, message: "Workplace not found." });
+        }
+
+        res.json({ success: true, workplace });
+    } catch (error) {
+        console.error("Error renaming workplace:", error);
+        res.status(500).json({ success: false, message: "Error renaming chat." });
+    }
+});
 
 await workplace.save();
 
