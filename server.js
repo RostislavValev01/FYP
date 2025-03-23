@@ -316,11 +316,17 @@ app.get('/recipe-recommendations', async (req, res) => {
         : "Generate 5 completely random dish recommendations.";
 
     try {
-        const prompt = `You are a recipe recommendation AI. Based on the following preferences, suggest 10 dish names:
-        
-        **User Preferences:** ${preferenceInstruction}
-        
-        Provide only dish names, separated by commas.`;
+        const prompt = `
+You are a recipe recommendation AI. Your job is to suggest dish ideas to users.
+
+If preferences are provided, make sure all suggestions strictly follow them.
+If no preferences are provided, return popular or interesting global dishes suitable for anyone.
+
+Preferences: ${userPreferences.length > 0 ? userPreferences.join(", ") : "None"}
+
+Return exactly 10 dish names, separated by commas. Do not ask for clarification. Do not include any explanation.
+`;
+
 
         const result = await model.generateContent(prompt);
         let recommendations = result.response.text().split(",").map(name => name.trim());
