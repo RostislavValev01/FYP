@@ -333,10 +333,16 @@ editBtn.addEventListener("click", (event) => {
 
         displayMessage("Fetching a random recipe...", "bot");
 
-        fetch("/random-recipe", {
-            method: "GET",
-            credentials: "include"
-        })
+        const responseLength = document.getElementById("response-length").value;
+const workplaceId = localStorage.getItem("activeWorkplace");
+
+fetch("/random-recipe", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ responseLength, workplaceId }),
+    credentials: "include"
+})
+
         .then(response => response.json())
         .then(data => {
             displayMessage(data.botResponse, "bot");
@@ -392,14 +398,14 @@ function saveRecipe() {
         return messageDiv;
     }
 
-    // Attach event listeners
+    
     const sendButton = document.getElementById("send-btn");
     const userInputField = document.getElementById("user-input");
 
     userInputField.addEventListener("keydown", function (event) {
         if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault(); // Prevent newline
-            sendMessage();          // Trigger send
+            event.preventDefault(); 
+            sendMessage();          
         }
     });
     
@@ -427,7 +433,7 @@ function createNewWorkplace() {
     .then(data => {
         if (!data.success || !data.workplace) { //  Only refresh if creation was successful
             console.error("API Error: Failed to create a workplace:", data);
-            alert("Error creating a chat session. Please try again.");
+            alert("Please login before you can request a recipe.");
             return;
         }
 
