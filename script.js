@@ -120,9 +120,23 @@ data.recommendations.forEach(recipe => {
             const chatBox = document.getElementById("chat-box");
             chatBox.innerHTML = ""; // Prevent duplicate messages
     
-            data.workplace.messages.forEach(msg => {
-                displayMessage(msg.text, msg.sender);
-            });
+            if (data.workplace.messages.length === 0) {
+                const greeting = "Hello! I'm your personal chef assistant, how can I help?";
+                displayMessage(greeting, "bot");
+            
+                // Save the greeting to the backend
+                fetch(`/workplaces/${workplaceId}/messages`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({ sender: "bot", text: greeting })
+                }).catch(console.error);
+            } else {
+                data.workplace.messages.forEach(msg => {
+                    displayMessage(msg.text, msg.sender);
+                });
+            }
+            
     
             // Update UI: Highlight selected workplace
             document.querySelectorAll(".workplace-item").forEach(item => {
@@ -507,7 +521,6 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch(error => console.error("Error fetching workplaces on load:", error));
 });
-
 
 
 

@@ -245,7 +245,8 @@ workplace.messages.push({ sender: "user", text: userInput });
 workplace.messages.push({ sender: "bot", text: botResponse });
 
 // If this is the first actual user message (after intro)
-if (workplace.messages.length === 3) {
+if (workplace.name.startsWith("Chat ") && workplace.messages.length <= 3)
+    {
     // Generate a smart title using AI
     const titlePrompt = `
     You are an assistant summarizing user messages for chat titles.
