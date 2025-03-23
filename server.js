@@ -350,11 +350,32 @@ app.post('/random-recipe', async (req, res) => {
         ? `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`
         : "Generate any random recipe.";
 
-    const prompt = `
-    You are an AI chef. Generate a random but delicious recipe.
-    ${lengthInstruction}
-    ${preferenceInstruction}
-    `;
+        // Create random cues to increase prompt entropy
+const themes = [
+    "inspired by a local street food culture",
+    "made with only 5 ingredients",
+    "perfect for a rainy day",
+    "based on a family secret recipe",
+    "with a global fusion twist",
+    "that includes an unexpected flavor combo",
+    "inspired by childhood favorites",
+    "good for camping or outdoor cooking",
+    "centered around seasonal produce",
+    "using only pantry staples"
+];
+
+const randomCue = themes[Math.floor(Math.random() * themes.length)];
+
+const prompt = `
+You are an imaginative and creative AI chef. Generate a completely unique and delicious recipe ${randomCue}. Avoid repeating popular or previously mentioned recipes like "Spicy Peanut Noodles".
+
+${lengthInstruction}
+${preferenceInstruction}
+
+Only return the recipe. Do not include greetings or explanations.
+`;
+
+        
 
     try {
         const result = await model.generateContent(prompt);
