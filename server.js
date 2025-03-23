@@ -334,29 +334,49 @@ app.get('/recipe-recommendations', async (req, res) => {
 
 
 
-// Random Recipe Route
-app.get('/random-recipe', async (req, res) => {
-    const userPreferences = req.session.user ? req.session.user.preferences || [] : [];
+app.post('/random-recipe', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ botResponse: "You need to log in to get a random recipe." });
+    }
+
+    const { responseLength, workplaceId } = req.body;
+    const userPreferences = req.session.user.preferences || [];
+
+    let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
+                            responseLength === "3" ? "Provide an extremely detailed response." :
+                            "Provide a balanced response.";
 
     let preferenceInstruction = userPreferences.length > 0
         ? `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`
         : "Generate any random recipe.";
 
-    try {
-        const prompt = `
-        You are an AI chef. Generate a completely random but delicious recipe.
-        **Dietary Preferences:** ${preferenceInstruction}
-        `;
+    const prompt = `
+    You are an AI chef. Generate a random but delicious recipe.
+    ${lengthInstruction}
+    ${preferenceInstruction}
+    `;
 
+    try {
         const result = await model.generateContent(prompt);
         let botResponse = result.response.text().replace(/\n/g, '<br>');
 
+        // Save to chat history if a workplace is given
+        if (workplaceId && mongoose.Types.ObjectId.isValid(workplaceId)) {
+            const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
+            if (workplace) {
+                workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
+                workplace.messages.push({ sender: "bot", text: botResponse });
+                await workplace.save();
+            }
+        }
+
         res.json({ botResponse });
     } catch (error) {
-        console.error("Error with AI request:", error);
+        console.error("Error generating random recipe:", error);
         res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
+
 
 app.post('/signin', async (req, res) => {
     const { email, password } = req.body;
