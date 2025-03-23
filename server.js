@@ -176,6 +176,8 @@ app.post('/chat', async (req, res) => {
     const userInput = req.body.userInput;
     const responseLength = req.body.responseLength || "2";
     const userPreferences = req.session.user.preferences || [];
+    const userAllergies = req.session.user.allergies || [];
+
     const workplaceId = req.body.workplaceId; 
 
     if (!userInput) {
@@ -200,7 +202,14 @@ app.post('/chat', async (req, res) => {
                         responseLength === "3" ? "Provide an extremely detailed response." :
                         "Provide a balanced response.";
 
-        let preferenceInstruction = userPreferences.length > 0 ? `Ensure the recipe follows these dietary preferences: ${userPreferences.join(", ")}.` : "";
+                        let preferenceInstruction = userPreferences.length > 0
+                        ? `Ensure the recipe follows these dietary preferences: ${userPreferences.join(", ")}.`
+                        : "";
+                    
+                    let allergyInstruction = userAllergies.length > 0
+                        ? `Avoid these allergens: ${userAllergies.join(", ")}.`
+                        : "";
+                    
 
         //Pass recent conversation history as context
         const prompt = `
@@ -215,6 +224,7 @@ app.post('/chat', async (req, res) => {
 
         **Response Length:** ${lengthInstruction}
         **Dietary Preferences:** ${preferenceInstruction}
+        **Allergy Constraints:** ${allergyInstruction}
 
         Respond in a helpful, clear, and friendly manner.
         `;
@@ -451,13 +461,15 @@ app.post('/signin', async (req, res) => {
             return res.status(400).send('Invalid password');
         }
 
-        // Store user in session with ID
         req.session.user = {
-            _id: user._id,  // Ensure _id is included
+            _id: user._id,
             email: user.email,
             preferences: user.preferences,
-            goal: user.goal
+            goal: user.goal,
+            allergies: user.allergies 
         };
+        
+        
 
         res.redirect('/index.html');
     } catch (err) {
@@ -466,7 +478,8 @@ app.post('/signin', async (req, res) => {
     }
 });
 app.post('/signup', async (req, res) => {
-    const { email, password, ['confirm-password']: confirmPassword, preferences, goal } = req.body;
+    const { email, password, ['confirm-password']: confirmPassword, preferences, goal, allergies } = req.body;
+
 
     if (!email || !password || !confirmPassword) {
         return res.status(400).send("All fields are required.");
@@ -486,27 +499,33 @@ app.post('/signup', async (req, res) => {
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Store preferences as array (checkboxes can return a string or array)
+        // Store preferences as array 
         const formattedPreferences = Array.isArray(preferences)
             ? preferences
             : preferences ? [preferences] : [];
 
+            const formattedAllergies = Array.isArray(allergies)
+            ? allergies
+            : allergies ? [allergies] : [];
+        
         // Create and save new user
         const newUser = new User({
-            email,
-            password: hashedPassword,
-            preferences: formattedPreferences,
-            goal
-        });
+    email,
+    password: hashedPassword,
+    preferences: formattedPreferences,
+    goal,
+    allergies: formattedAllergies
+});
+
 
         await newUser.save();
 
-        // Set session after signup
         req.session.user = {
             _id: newUser._id,
             email: newUser.email,
             preferences: newUser.preferences,
-            goal: newUser.goal
+            goal: newUser.goal,
+            allergies: newUser.allergies 
         };
 
         res.redirect('/index.html'); // Redirect to home or dashboard
@@ -543,8 +562,10 @@ app.get('/account-data', async (req, res) => {
         res.json({
             email: user.email,
             preferences: user.preferences || [],
-            goal: user.goal || "Not Set"
+            goal: user.goal || "Not Set",
+            allergies: user.allergies || []
         });
+        
     } catch (err) {
         console.error("Error fetching account data:", err);
         res.status(500).json({ error: "Internal Server Error" });
@@ -583,6 +604,34 @@ app.delete('/delete-recipe/:id', async (req, res) => {
     } catch (error) {
         console.error("Error deleting recipe:", error);
         res.status(500).json({ success: false, message: "Error deleting recipe." });
+    }
+});
+
+app.post('/account-data', async (req, res) => {
+    if (!req.session.user) return res.status(401).json({ success: false, message: "Unauthorized" });
+
+    const { preferences, goal, allergies } = req.body;
+
+    try {
+        const user = await User.findById(req.session.user._id);
+
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        if (preferences) user.preferences = preferences;
+        if (goal) user.goal = goal;
+        if (allergies) user.allergies = allergies;
+
+        await user.save();
+
+        // Update session immediately
+        req.session.user.preferences = user.preferences;
+        req.session.user.goal = user.goal;
+        req.session.user.allergies = user.allergies;
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error("Error updating account:", err);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 });
 

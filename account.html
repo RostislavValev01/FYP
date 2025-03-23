@@ -12,71 +12,131 @@
         <div class="nav-links">
             <a href="recipes.html" class="nav-btn">My Recipes</a>
             <button id="logout-btn" class="nav-btn">Log Out</button>
-           
         </div>
     </nav>
-    <!-- Title Box -->
+
     <div class="account-title-box">
         <h2>My Account</h2>
         <p>Welcome chef! This is your account dashboard.</p>
     </div>
 
-    
-
     <div class="account-container">
         <h2>Account Information</h2>
         <p><strong>Email:</strong> <span id="user-email"></span></p>
-        
-        <h3>Food Preferences</h3>
-        <p id="food-preferences"></p>
-        
-        <h3>Goal</h3>
-        <p id="user-goal"></p>
-        
-        
-        <a href="passwordchange.html" id="change-password">Change Password</a>
 
-        
+        <!-- Preference Dropdown -->
+        <h3>Food Preference</h3>
+        <select id="food-preference-select">
+            <option value="">-- Select a preference --</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Vegan">Vegan</option>
+            <option value="Halal">Halal</option>
+            <option value="Gluten-free">Gluten-free</option>
+            <option value="Lactose-free/Dairy-free">Lactose-free / Dairy-free</option>
+            <option value="Ketogenic">Ketogenic</option>
+        </select>
+
+        <!-- Goal Dropdown -->
+        <h3>Cooking Goal</h3>
+        <select id="goal-select">
+            <option value="">-- Select a goal --</option>
+            <option value="Learn to cook healthy food">Learn to cook healthy food</option>
+            <option value="Improvise with new recipes">Improvise with new recipes</option>
+            <option value="Learn new varieties of food">Learn new varieties of food</option>
+        </select>
+
+        <!-- Allergies -->
+        <h3>Allergies</h3>
+        <div id="allergy-options">
+            <label><input type="checkbox" value="Peanuts"> Peanuts</label><br>
+            <label><input type="checkbox" value="Shellfish"> Shellfish</label><br>
+            <label><input type="checkbox" value="Soy"> Soy</label><br>
+            <label><input type="checkbox" value="Wheat"> Wheat</label><br>
+            <label><input type="checkbox" value="Eggs"> Eggs</label><br>
+            <label><input type="checkbox" value="Tree nuts"> Tree nuts</label><br>
+        </div>
+
+        <a href="passwordchange.html" id="change-password">Change Password</a>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('/account-data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("user-email").textContent = data.email;
-                    document.getElementById("user-goal").textContent = data.goal || "Not Set";
-    
-                    const foodList = document.getElementById("food-preferences");
-                    foodList.innerHTML = "";
-    
-                    if (data.preferences && data.preferences.length > 0) {
-                        data.preferences.forEach(pref => {
-                            const li = document.createElement("li");
-                            li.textContent = pref;
-                            foodList.appendChild(li);
-                        });
-                    } else {
-                        foodList.innerHTML = "<p>No preferences set.</p>";
-                    }
-                })
-                .catch(error => console.error("Error fetching account data:", error));
+    document.addEventListener("DOMContentLoaded", function () {
+        // Load user data
+        fetch('/account-data')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("user-email").textContent = data.email;
+
+                document.getElementById("food-preference-select").value = data.preferences?.[0] || "";
+                document.getElementById("goal-select").value = data.goal || "";
+
+                // Allergies
+                if (data.allergies) {
+                    const checkboxes = document.querySelectorAll("#allergy-options input[type='checkbox']");
+                    checkboxes.forEach(box => {
+                        if (data.allergies.includes(box.value)) box.checked = true;
+                    });
+                }
+            });
+
+        // Change handlers
+        document.getElementById("food-preference-select").addEventListener("change", function () {
+            const confirmed = confirm("Are you sure you want to change your preferences?");
+            if (confirmed) updateAccount({ preferences: [this.value] });
         });
 
-        // ✅ Logout functionality
+        document.getElementById("goal-select").addEventListener("change", function () {
+            const confirmed = confirm("Are you sure you want to change your goal?");
+            if (confirmed) updateAccount({ goal: this.value });
+        });
+
+        const allergyCheckboxes = document.querySelectorAll("#allergy-options input[type='checkbox']");
+        allergyCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", function () {
+                const confirmed = confirm("Are you sure you want to update your allergies?");
+                if (confirmed) {
+                    const selectedAllergies = Array.from(document.querySelectorAll("#allergy-options input:checked"))
+                        .map(box => box.value);
+                    updateAccount({ allergies: selectedAllergies });
+                }
+            });
+        });
+
+        function updateAccount(data) {
+            fetch('/account-data', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    alert("Account updated successfully.");
+                    location.reload();
+                } else {
+                    alert("Failed to update account.");
+                }
+            })
+            .catch(err => {
+                console.error("Error updating account:", err);
+                alert("Error updating account.");
+            });
+        }
+
         document.getElementById("logout-btn").addEventListener("click", function () {
             fetch("/logout")
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         alert("Logged out successfully!");
-                        window.location.href = "signin.html"; // Redirect to sign-in page
+                        window.location.href = "signin.html";
                     } else {
                         alert("Logout failed. Try again.");
                     }
                 })
                 .catch(error => console.error("Error logging out:", error));
         });
+    });
     </script>
 </body>
 </html>
