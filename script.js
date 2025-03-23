@@ -332,7 +332,7 @@ editBtn.addEventListener("click", (event) => {
         }
 
         displayMessage("Fetching a random recipe...", "bot");
-
+        
         const responseLength = document.getElementById("response-length").value;
 const workplaceId = localStorage.getItem("activeWorkplace");
 
@@ -347,6 +347,8 @@ fetch("/random-recipe", {
         .then(data => {
             displayMessage(data.botResponse, "bot");
             latestRecipe = data.botResponse; // Store random recipe for saving
+            renderWorkplaces(); // Refresh chat titles after random recipe
+
         })
         .catch(error => {
             console.error("Error fetching random recipe:", error);

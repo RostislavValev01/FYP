@@ -387,7 +387,34 @@ Only return the recipe. Do not include greetings or explanations.
             if (workplace) {
                 workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
                 workplace.messages.push({ sender: "bot", text: botResponse });
+                
+                // If this is the first actual recipe response (after intro)
+                if (workplace.messages.length === 3) {
+                    try {
+                        const titlePrompt = `
+                        Extract a short, clear, and creative title from this recipe:
+                
+                        ${botResponse.replace(/<br>/g, '\n')}
+                
+                        Only return the name of the dish. Do not include any extra text.
+                        `;
+                
+                        const titleResult = await model.generateContent(titlePrompt);
+                        let extractedTitle = titleResult.response.text().trim();
+                
+                        if (!extractedTitle || extractedTitle.length < 3) {
+                            extractedTitle = "Random Recipe";
+                        }
+                
+                        workplace.name = extractedTitle;
+                    } catch (err) {
+                        console.error("Error generating title from recipe:", err);
+                        workplace.name = "Random Recipe";
+                    }
+                }
+                
                 await workplace.save();
+                
             }
         }
 
