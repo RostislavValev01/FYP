@@ -589,4 +589,115 @@ button:hover {
 .recommendation-item {
     transition: background 0.3s, opacity 0.3s;
 }
+/* Updated account layout with 3 columns */
+.account-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 95%;
+    max-width: 1000px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    margin: 50px auto;
+}
+
+.account-sections {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.account-section {
+    flex: 1;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.account-section h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.account-section select,
+.account-section input[type="checkbox"] {
+    margin-bottom: 10px;
+    width: 100%;
+}
+/* Stylized dropdowns inside account sections */
+.account-section select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 12px 14px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.account-section select:focus {
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.2);
+    outline: none;
+}
+#allergy-options {
+    display: grid;
+    grid-template-columns: auto; /* single column */
+    margin-top: 10px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+#allergy-options label {
+    justify-content: center; /* NEW: center checkbox + label horizontally */
+    text-align: center;
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 15px;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#allergy-options label:hover {
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+#allergy-options input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    accent-color: #2E8B57;
+    cursor: pointer;
+}
+/* Center content inside each account section */
+.account-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center; /* centers the headings */
+}
+
+/* Center the allergy checkboxes grid */
+#allergy-options {
+    justify-content: center;
+}
 
