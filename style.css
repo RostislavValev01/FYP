@@ -115,7 +115,7 @@ body {
     background-color: #e1f7d5; 
     color: #222;               
     align-self: flex-start;
-    padding: 16px 18px;
+    padding: 16px 24px 16px 30px;
     border-radius: 12px;
     font-family: "Arial", "Verdana", "Tahoma", sans-serif;
     font-size: 18px;
@@ -701,3 +701,24 @@ button:hover {
     justify-content: center;
 }
 
+.recipe-body {
+    text-align: left;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.recipe-body h2, .recipe-body h3 {
+    margin-top: 15px;
+    color: #2E8B57;
+}
+
+.recipe-body ul, .recipe-body ol {
+    margin-left: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.recipe-body li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+}

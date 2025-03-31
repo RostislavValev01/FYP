@@ -11,6 +11,7 @@ const Recipe = require('./models/recipes');
 const Workplace = require('./models/Workplace');
 const app = express();
 const port = 3000;
+const { marked } = require('marked');
 
 // Basic middleware setup
 app.use(express.json());
@@ -238,7 +239,10 @@ app.post('/chat', async (req, res) => {
             return res.status(500).json({ botResponse: "Error: AI did not return a valid response." });
         }
 
-        let botResponse = result.response.text().replace(/\n/g, '<br>');
+        let rawText = result.response.text();
+        let botResponse = rawText; 
+
+
 
       // Add user and bot messages
 workplace.messages.push({ sender: "user", text: userInput });

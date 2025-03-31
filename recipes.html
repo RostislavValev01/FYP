@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Recipes</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 </head>
 <body>
     <nav class="navbar">
@@ -41,16 +43,24 @@
         
                             if (recipeLines.length === 0) return;
         
-                            let title = recipeLines.shift().replace(/[#*]+/g, "").trim();
+                            let rawTitle = recipeLines.shift().replace(/[#*]+/g, "").trim();
+                            let txt = document.createElement("textarea");
+                            txt.innerHTML = rawTitle;
+                            let title = txt.value;
+                            title = title.replace(/&#39;/g, "'");
+
+
                             let body = recipeLines.join("\n").trim();
-                            body = body.toLowerCase().replace(/(^\w|\.\s*\w)/g, match => match.toUpperCase());
+                            const htmlBody = marked.parse(body);
+
         
                             const recipeDiv = document.createElement("div");
                             recipeDiv.classList.add("recipe-box");
                             recipeDiv.innerHTML = `
                                 <button class="delete-recipe-btn" data-id="${recipe._id}">Remove this recipe</button>
                                 <h3 class="recipe-title">${title}</h3>
-                                <p class="recipe-body">${body}</p>
+                               <div class="recipe-body">${htmlBody}</div>
+
                             `;
         
                             recipeContainer.appendChild(recipeDiv);

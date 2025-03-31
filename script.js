@@ -412,7 +412,7 @@ function saveRecipe() {
         const chatBox = document.getElementById('chat-box');
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
-        messageDiv.innerHTML = `<p>${message}</p>`;
+        messageDiv.innerHTML = marked.parse(message);
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
         return messageDiv;
