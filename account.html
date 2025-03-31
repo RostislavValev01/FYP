@@ -15,49 +15,56 @@
         </div>
     </nav>
 
-    <div class="account-title-box">
-        <h2>My Account</h2>
-        <p>Welcome chef! This is your account dashboard.</p>
-    </div>
+    
 
     <div class="account-container">
         <h2>Account Information</h2>
+        <p>Welcome chef! This is your account dashboard.</p>
         <p><strong>Email:</strong> <span id="user-email"></span></p>
-
-        <!-- Preference Dropdown -->
-        <h3>Food Preference</h3>
-        <select id="food-preference-select">
-            <option value="">-- Select a preference --</option>
-            <option value="Vegetarian">Vegetarian</option>
-            <option value="Vegan">Vegan</option>
-            <option value="Halal">Halal</option>
-            <option value="Gluten-free">Gluten-free</option>
-            <option value="Lactose-free/Dairy-free">Lactose-free / Dairy-free</option>
-            <option value="Ketogenic">Ketogenic</option>
-        </select>
-
-        <!-- Goal Dropdown -->
-        <h3>Cooking Goal</h3>
-        <select id="goal-select">
-            <option value="">-- Select a goal --</option>
-            <option value="Learn to cook healthy food">Learn to cook healthy food</option>
-            <option value="Improvise with new recipes">Improvise with new recipes</option>
-            <option value="Learn new varieties of food">Learn new varieties of food</option>
-        </select>
-
-        <!-- Allergies -->
-        <h3>Allergies</h3>
-        <div id="allergy-options">
-            <label><input type="checkbox" value="Peanuts"> Peanuts</label><br>
-            <label><input type="checkbox" value="Shellfish"> Shellfish</label><br>
-            <label><input type="checkbox" value="Soy"> Soy</label><br>
-            <label><input type="checkbox" value="Wheat"> Wheat</label><br>
-            <label><input type="checkbox" value="Eggs"> Eggs</label><br>
-            <label><input type="checkbox" value="Tree nuts"> Tree nuts</label><br>
+    
+        <div class="account-sections">
+            <!-- Food Preference -->
+            <div class="account-section">
+                <h3>Food Preference</h3>
+                <select id="food-preference-select">
+                    <option value="">-- Select a preference --</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Halal">Halal</option>
+                    <option value="Gluten-free">Gluten-free</option>
+                    <option value="Lactose-free/Dairy-free">Lactose-free / Dairy-free</option>
+                    <option value="Ketogenic">Ketogenic</option>
+                </select>
+            </div>
+    
+            <!-- Cooking Goal -->
+            <div class="account-section">
+                <h3>Cooking Goal</h3>
+                <select id="goal-select">
+                    <option value="">-- Select a goal --</option>
+                    <option value="Learn to cook healthy food">Learn to cook healthy food</option>
+                    <option value="Improvise with new recipes">Improvise with new recipes</option>
+                    <option value="Learn new varieties of food">Learn new varieties of food</option>
+                </select>
+            </div>
+    
+            <!-- Allergies -->
+            <div class="account-section">
+                <h3>Allergies</h3>
+                <div id="allergy-options">
+                    <label><input type="checkbox" value="Peanuts"> Peanuts</label><br>
+                    <label><input type="checkbox" value="Shellfish"> Shellfish</label><br>
+                    <label><input type="checkbox" value="Soy"> Soy</label><br>
+                    <label><input type="checkbox" value="Wheat"> Wheat</label><br>
+                    <label><input type="checkbox" value="Eggs"> Eggs</label><br>
+                    <label><input type="checkbox" value="Tree nuts"> Tree nuts</label><br>
+                </div>
+            </div>
         </div>
-
+    
         <a href="passwordchange.html" id="change-password">Change Password</a>
     </div>
+    
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
