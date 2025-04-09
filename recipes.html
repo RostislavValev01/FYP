@@ -29,77 +29,86 @@
             fetch(`/get-recipes`)
                 .then(response => response.json())
                 .then(data => {
-                    if (!data.success || !data.recipes || data.recipes.length === 0) {
-                        document.getElementById("saved-recipes").innerHTML = "<p>No saved recipes found.</p>";
+                    const container = document.getElementById("saved-recipes");
+                    container.innerHTML = "";
+        
+                    if (!data.success || !data.recipes.length) {
+                        container.innerHTML = "<p>No saved recipes found.</p>";
                         return;
                     }
         
-                    const recipeContainer = document.getElementById("saved-recipes");
-                    recipeContainer.innerHTML = "";
-        
                     data.recipes.forEach(recipe => {
-                        if (recipe.content) {
-                            let recipeLines = recipe.content.trim().split("\n");
+                        let recipeLines = recipe.content.trim().split("\n");
+                        if (!recipeLines.length) return;
         
-                            if (recipeLines.length === 0) return;
+                        const rawTitle = recipeLines.shift().replace(/[#*]+/g, "").trim();
+                        const title = rawTitle.replace(/&#39;/g, "'");
+                        const description = recipeLines.slice(0, 3).join(" ").substring(0, 100) + "...";
+                        const bodyHTML = marked.parse(recipeLines.join("\n"));
         
-                            let rawTitle = recipeLines.shift().replace(/[#*]+/g, "").trim();
-                            let txt = document.createElement("textarea");
-                            txt.innerHTML = rawTitle;
-                            let title = txt.value;
-                            title = title.replace(/&#39;/g, "'");
-
-
-                            let body = recipeLines.join("\n").trim();
-                            const htmlBody = marked.parse(body);
-
+                        const card = document.createElement("div");
+                        card.classList.add("recipe-card");
+                        card.innerHTML = `
+                            <h3>${title}</h3>
+                            <p>${description}</p>
+                            <div class="recipe-timestamp">Saved: ${new Date(recipe.createdAt).toLocaleString()}</div>
+                        `;
         
-                            const recipeDiv = document.createElement("div");
-                            recipeDiv.classList.add("recipe-box");
-                            recipeDiv.innerHTML = `
-                                <button class="delete-recipe-btn" data-id="${recipe._id}">Remove this recipe</button>
-                                <h3 class="recipe-title">${title}</h3>
-                               <div class="recipe-body">${htmlBody}</div>
-
-                            `;
-        
-                            recipeContainer.appendChild(recipeDiv);
-                        }
-                    });
-        
-                    // Attach delete event listeners
-                    document.querySelectorAll(".delete-recipe-btn").forEach(button => {
-                        button.addEventListener("click", function () {
-                            const recipeId = this.dataset.id;
-                            deleteRecipe(recipeId);
-                        });
+                        card.addEventListener("click", () => showModal(title, bodyHTML, recipe._id));
+                        container.appendChild(card);
                     });
                 })
-                .catch(error => {
-                    console.error("Error fetching recipes:", error);
-                    document.getElementById("saved-recipes").innerHTML = "<p>Error loading recipes. Try again later.</p>";
+                .catch(() => {
+                    document.getElementById("saved-recipes").innerHTML = "<p>Error loading recipes.</p>";
                 });
-        });
         
-        function deleteRecipe(recipeId) {
-            if (!confirm("Are you sure you want to delete this recipe? This cannot be undone.")) return;
-        
+                function showModal(title, body, recipeId) {
+    const overlay = document.createElement("div");
+    overlay.classList.add("recipe-modal-overlay");
+
+    overlay.innerHTML = `
+        <div class="recipe-modal">
+            <span class="recipe-modal-close" title="Close">&times;</span>
+            <button class="delete-recipe-btn" data-id="${recipeId}">Remove this recipe</button>
+            <h2>${title}</h2>
+            <div class="recipe-body">${body}</div>
+        </div>
+    `;
+
+    // Close when clicking the X
+    overlay.querySelector(".recipe-modal-close").onclick = () => overlay.remove();
+
+    // ✅ Close when clicking outside the modal
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+
+    // Delete button handler
+    overlay.querySelector(".delete-recipe-btn").onclick = function () {
+        if (confirm("Are you sure you want to delete this recipe?")) {
             fetch(`/delete-recipe/${recipeId}`, {
                 method: "DELETE",
                 credentials: "include"
             })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    alert("Recipe deleted successfully!");
+                    alert("Deleted!");
+                    overlay.remove();
                     location.reload();
                 } else {
-                    alert("Failed to delete recipe.");
+                    alert("Failed to delete.");
                 }
-            })
-            .catch(error => console.error("Error deleting recipe:", error));
+            });
         }
+    };
+
+    document.body.appendChild(overlay);
+}
+
+        });
         </script>
+        
         
     
     
