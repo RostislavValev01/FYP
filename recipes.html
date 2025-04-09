@@ -31,83 +31,111 @@
                 .then(data => {
                     const container = document.getElementById("saved-recipes");
                     container.innerHTML = "";
-        
+    
                     if (!data.success || !data.recipes.length) {
                         container.innerHTML = "<p>No saved recipes found.</p>";
                         return;
                     }
-        
+    
                     data.recipes.forEach(recipe => {
-                        let recipeLines = recipe.content.trim().split("\n");
-                        if (!recipeLines.length) return;
-        
-                        const rawTitle = recipeLines.shift().replace(/[#*]+/g, "").trim();
-                        const title = rawTitle.replace(/&#39;/g, "'");
-                        const description = recipeLines.slice(0, 3).join(" ").substring(0, 100) + "...";
-                        const bodyHTML = marked.parse(recipeLines.join("\n"));
-        
+                        const fullText = recipe.content;
+    
+                        // Clean the content before rendering in the modal
+                        let lines = fullText.trim().split("\n");
+    
+                        const startIndex = lines.findIndex(line =>
+                            line.toLowerCase().includes("ingredients:") ||
+                            line.toLowerCase().includes("instructions:") ||
+                            line.toLowerCase().includes("prep time:") ||
+                            /^\s*\*\*.*\*\*/.test(line) // match bold lines
+                        );
+    
+                        if (startIndex > 0) {
+                            lines = lines.slice(startIndex);
+                        }
+    
+                        const bodyHTML = marked.parse(lines.join("\n"));
+    
                         const card = document.createElement("div");
                         card.classList.add("recipe-card");
+    
                         card.innerHTML = `
-                            <h3>${title}</h3>
-                            <p>${description}</p>
+                            <h3><em>Loading title...</em></h3>
+                            <p><em>Loading description...</em></p>
                             <div class="recipe-timestamp">Saved: ${new Date(recipe.createdAt).toLocaleString()}</div>
                         `;
-        
-                        card.addEventListener("click", () => showModal(title, bodyHTML, recipe._id));
+    
+                        card.addEventListener("click", () => showModal(card.querySelector("h3").textContent, bodyHTML, recipe._id));
                         container.appendChild(card);
+    
+                        fetch('/generate-recipe-description', {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ content: fullText }),
+                            credentials: "include"
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                card.querySelector("h3").textContent = data.title;
+                                card.querySelector("p").textContent = data.description;
+                            } else {
+                                card.querySelector("p").textContent = "Description unavailable.";
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Description fetch failed:", err);
+                            card.querySelector("p").textContent = "Error loading description.";
+                        });
                     });
                 })
                 .catch(() => {
                     document.getElementById("saved-recipes").innerHTML = "<p>Error loading recipes.</p>";
                 });
-        
-                function showModal(title, body, recipeId) {
-    const overlay = document.createElement("div");
-    overlay.classList.add("recipe-modal-overlay");
-
-    overlay.innerHTML = `
-        <div class="recipe-modal">
-            <span class="recipe-modal-close" title="Close">&times;</span>
-            <button class="delete-recipe-btn" data-id="${recipeId}">Remove this recipe</button>
-            <h2>${title}</h2>
-            <div class="recipe-body">${body}</div>
-        </div>
-    `;
-
-    // Close when clicking the X
-    overlay.querySelector(".recipe-modal-close").onclick = () => overlay.remove();
-
-    // ✅ Close when clicking outside the modal
-    overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-
-    // Delete button handler
-    overlay.querySelector(".delete-recipe-btn").onclick = function () {
-        if (confirm("Are you sure you want to delete this recipe?")) {
-            fetch(`/delete-recipe/${recipeId}`, {
-                method: "DELETE",
-                credentials: "include"
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Deleted!");
-                    overlay.remove();
-                    location.reload();
-                } else {
-                    alert("Failed to delete.");
-                }
-            });
-        }
-    };
-
-    document.body.appendChild(overlay);
-}
-
+    
+            function showModal(title, body, recipeId) {
+                const overlay = document.createElement("div");
+                overlay.classList.add("recipe-modal-overlay");
+    
+                overlay.innerHTML = `
+                    <div class="recipe-modal">
+                        <span class="recipe-modal-close" title="Close">&times;</span>
+                        <button class="delete-recipe-btn" data-id="${recipeId}">Remove this recipe</button>
+                        <h2>${title}</h2>
+                        <div class="recipe-body">${body}</div>
+                    </div>
+                `;
+    
+                overlay.querySelector(".recipe-modal-close").onclick = () => overlay.remove();
+                overlay.addEventListener("click", (e) => {
+                    if (e.target === overlay) overlay.remove();
+                });
+    
+                overlay.querySelector(".delete-recipe-btn").onclick = function () {
+                    if (confirm("Are you sure you want to delete this recipe?")) {
+                        fetch(`/delete-recipe/${recipeId}`, {
+                            method: "DELETE",
+                            credentials: "include"
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert("Deleted!");
+                                overlay.remove();
+                                location.reload();
+                            } else {
+                                alert("Failed to delete.");
+                            }
+                        });
+                    }
+                };
+    
+                document.body.appendChild(overlay);
+            }
         });
-        </script>
+    </script>
+    
+        
         
         
     
