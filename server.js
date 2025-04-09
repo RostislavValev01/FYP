@@ -276,6 +276,43 @@ if (workplace.name.startsWith("Chat ") && workplace.messages.length <= 3)
         workplace.name = userInput.slice(0, 40);
     }
 }
+app.post('/generate-recipe-description', async (req, res) => {
+    const { content } = req.body;
+
+    if (!content || content.trim() === "") {
+        return res.status(400).json({ success: false, message: "No content provided." });
+    }
+
+    try {
+        const prompt = `
+From the following recipe content, extract:
+1. A short, clear title (just the name of the dish).
+2. A 1–2 sentence engaging description.
+
+Format your response as:
+Title: [title]
+Description: [description]
+
+Recipe:
+${content}
+        `;
+
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+
+        const titleMatch = text.match(/Title:\s*(.+)/i);
+        const descMatch = text.match(/Description:\s*([\s\S]+)/i);
+
+        const title = titleMatch ? titleMatch[1].trim() : "Untitled";
+        const description = descMatch ? descMatch[1].trim() : "No description provided.";
+
+        res.json({ success: true, title, description });
+    } catch (err) {
+        console.error("Description generation failed:", err);
+        res.status(500).json({ success: false, message: "Failed to generate description." });
+    }
+});
+
 
 // Update workplace name
 app.put('/workplaces/:id/rename', async (req, res) => {
