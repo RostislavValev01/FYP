@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 </head>
 <body>
-<nav class="navbar">
-    <a href="index.html" class="logo">AI Chef Buddy</a>
-</nav>
+  <nav class="navbar">
+    <a href="index.html" class="logo"></i> AI Chef Buddy</a>
+  </nav>
 
-<div class="auth-container">
+  <div class="auth-container">
     <h2>Sign Up</h2>
     <form action="/signup" method="POST">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required />
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
 
-        <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirm-password" required>
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" id="confirm-password" name="confirm-password" required />
 
-        <!-- Food Preferences -->
-        <h3>Food Preference</h3>
-        <select name="preferences">
+      <!-- Grid Layout for Selects and Checkboxes -->
+      <div class="account-sections">
+
+        <!-- Food Preference -->
+        <div class="account-section">
+          <h3>Food Preference</h3>
+          <select name="preferences">
             <option value="">-- Select a preference --</option>
             <option value="Vegetarian">Vegetarian</option>
             <option value="Vegan">Vegan</option>
@@ -33,30 +38,39 @@
             <option value="Gluten-free">Gluten-free</option>
             <option value="Lactose-free/Dairy-free">Lactose-free / Dairy-free</option>
             <option value="Ketogenic">Ketogenic</option>
-        </select>
+          </select>
+        </div>
 
         <!-- Allergies -->
-        <h3>Allergies (Optional)</h3>
-        <label><input type="checkbox" name="allergies" value="Peanuts"> Peanuts</label><br>
-        <label><input type="checkbox" name="allergies" value="Shellfish"> Shellfish</label><br>
-        <label><input type="checkbox" name="allergies" value="Soy"> Soy</label><br>
-        <label><input type="checkbox" name="allergies" value="Wheat"> Wheat</label><br>
-        <label><input type="checkbox" name="allergies" value="Eggs"> Eggs</label><br>
-        <label><input type="checkbox" name="allergies" value="Tree nuts"> Tree nuts</label><br>
+        <div class="account-section">
+          <h3>Allergies (Optional)</h3>
+          <div id="allergy-options">
+            <label><input type="checkbox" name="allergies" value="Peanuts"> Peanuts</label><br>
+            <label><input type="checkbox" name="allergies" value="Shellfish"> Shellfish</label><br>
+            <label><input type="checkbox" name="allergies" value="Soy"> Soy</label><br>
+            <label><input type="checkbox" name="allergies" value="Wheat"> Wheat</label><br>
+            <label><input type="checkbox" name="allergies" value="Eggs"> Eggs</label><br>
+            <label><input type="checkbox" name="allergies" value="Tree nuts"> Tree nuts</label><br>
+          </div>
+        </div>
 
-        <!-- Goal Selection -->
-        <h3>Cooking Goal</h3>
-        <select name="goal">
+        <!-- Cooking Goal -->
+        <div class="account-section">
+          <h3>Cooking Goal</h3>
+          <select name="goal">
             <option value="">-- Select a goal --</option>
             <option value="Learn to cook healthy food">Learn to cook healthy food</option>
             <option value="Improvise with new recipes">Improvise with new recipes</option>
             <option value="Learn new varieties of food">Learn new varieties of food</option>
-        </select>
+          </select>
+        </div>
 
-        <button type="submit">Sign Up</button>
+      </div>
+
+      <button type="submit">Sign Up</button>
     </form>
 
     <p>Already have an account? <a href="signin.html">Sign In</a></p>
-</div>
+  </div>
 </body>
 </html>

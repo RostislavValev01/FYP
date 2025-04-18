@@ -791,3 +791,7 @@ button:hover {
     margin-top: 6px;
     justify-content: center;
 }
+.navbar i {
+    margin-right: 6px;
+  }
+  

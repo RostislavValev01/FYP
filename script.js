@@ -8,7 +8,8 @@ document.addEventListener("DOMContentLoaded", function () {
     .then(data => {
         const accountBtn = document.getElementById("account-btn");
         if (data.loggedIn) {
-            accountBtn.textContent = "My Account";
+            accountBtn.innerHTML = '<i class="fa fa-user"></i> My Account';
+
             accountBtn.href = "account.html";
             isLoggedIn = true; 
             fetchRecommendations();
@@ -27,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 });
         } else {
-            accountBtn.textContent = "Sign In";
+            accountBtn.innerHTML = '<i class="fa fa-sign-in"></i> Sign In';
+
             accountBtn.href = "signin.html";
             isLoggedIn = false;
             document.getElementById("recommendation-container").innerHTML = "<p>Login to see recommendations.</p>";
