@@ -193,11 +193,19 @@ data.recommendations.forEach(recipe => {
                     workplaceDiv.classList.add("workplace-item");
                     workplaceDiv.textContent = workplace.name;
                     workplaceDiv.dataset.id = workplace._id;
-    
+                
                     // Attach click event to switch workplaces
                     workplaceDiv.addEventListener("click", () => switchWorkplace(workplace._id));
-    
-                    // ✅ Conditionally create Delete Button
+                
+                    // Create a flex container to hold buttons
+                    const buttonGroup = document.createElement("div");
+                    buttonGroup.classList.add("workplace-button-group"); // optional if you add the CSS class
+                    // Alternatively, use inline styles:
+                    // buttonGroup.style.display = "flex";
+                    // buttonGroup.style.gap = "8px";
+                    // buttonGroup.style.marginTop = "6px";
+                
+                    // Conditionally create Delete Button
                     if (showDelete) {
                         const deleteBtn = document.createElement("button");
                         deleteBtn.classList.add("delete-workplace-btn");
@@ -206,16 +214,15 @@ data.recommendations.forEach(recipe => {
                             event.stopPropagation(); // Prevent switching chat
                             deleteWorkplace(workplace._id);
                         });
-                        workplaceDiv.appendChild(deleteBtn);
+                        buttonGroup.appendChild(deleteBtn);
                     }
-    
+                
                     // Create Edit Button
                     const editBtn = document.createElement("button");
                     editBtn.classList.add("edit-workplace-btn");
                     editBtn.textContent = "Edit";
                     editBtn.style.color = "blue";
-                    editBtn.style.marginLeft = "10px";
-    
+                
                     editBtn.addEventListener("click", (event) => {
                         event.stopPropagation(); // Avoid triggering chat switch
                         const newName = prompt("Enter a new name for this chat:", workplace.name);
@@ -226,7 +233,13 @@ data.recommendations.forEach(recipe => {
                                 body: JSON.stringify({ newName }),
                                 credentials: "include"
                             })
-                            .then(res => res.json())
+                            .then(async res => {
+                                if (!res.ok) {
+                                    const errorText = await res.text();
+                                    throw new Error(`Server error: ${res.status} - ${errorText}`);
+                                }
+                                return res.json();
+                            })
                             .then(data => {
                                 if (data.success) {
                                     renderWorkplaces(); // Refresh list
@@ -240,10 +253,14 @@ data.recommendations.forEach(recipe => {
                             });
                         }
                     });
-    
-                    workplaceDiv.appendChild(editBtn); // Append edit button
+                
+                    buttonGroup.appendChild(editBtn);
+                
+                    // Add button group to the workplace item
+                    workplaceDiv.appendChild(buttonGroup);
                     workplacesContainer.appendChild(workplaceDiv);
                 });
+                
     
                 // Auto-switch to first if none is selected
                 if (!localStorage.getItem("activeWorkplace") && data.workplaces.length > 0) {
