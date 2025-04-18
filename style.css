@@ -785,3 +785,9 @@ button:hover {
     cursor: pointer;
     color: #333;
 }
+.workplace-button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    justify-content: center;
+}
