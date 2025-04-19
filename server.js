@@ -12,6 +12,15 @@ const Workplace = require('./models/Workplace');
 const app = express();
 const port = 3000;
 const { marked } = require('marked');
+const { Configuration, OpenAIApi } = require("openai");
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+const openai = new OpenAIApi(configuration);
+
+
 
 // Basic middleware setup
 app.use(express.json());
@@ -345,7 +354,42 @@ await workplace.save();
 
 
 
-        res.json({ botResponse });
+await workplace.save();
+
+const isRecipeRequest = /recipe|how do i cook|how to cook|make me a|give me a recipe|dish/i.test(userInput);
+
+let imageUrl = null;
+
+if (isRecipeRequest) {
+  try {
+    const imageResponse = await openai.createImage({
+        prompt: `Ultra-realistic, high-quality food photography of a beautifully plated dish: ${userInput}. Studio lighting, shallow depth of field, realistic textures, vibrant colors.`
+        ,
+      n: 1,
+      size: "512x512",
+      response_format: "url"
+    });
+
+    imageUrl = imageResponse.data.data[0].url;
+  } catch (error) {
+    console.error("Image generation failed:", error.response?.data || error.message || error);
+  }
+}
+
+
+if (isRecipeRequest) {
+    if (!imageUrl) {
+      imageUrl = "https://source.unsplash.com/featured/?food";
+    }
+  
+    botResponse += `<br><br><img src="${imageUrl}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
+  }
+  
+  res.json({ botResponse });
+  
+  
+  
+
 
     } catch (error) {
         console.error("Error with AI request:", error);
