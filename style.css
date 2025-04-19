@@ -71,19 +71,20 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Chat Container */
 .chat-container {
+    position: absolute;
+    top: 80px;
+    left: 290px;
+    right: 290px;
+    bottom: 20px;
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
-    width: 70%;
-    max-width: 1100px;
-    height: calc(100vh - 120px); 
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    margin-top: 40px;
 }
+
 
 /* Chat Box */
 .chat-box {
@@ -795,3 +796,9 @@ button:hover {
     margin-right: 6px;
   }
   
+.recipe-recommendation-section,
+.workplace-section,
+.chat-container {
+    margin-top: 25px; /* Adjust to your desired space */
+}
+
