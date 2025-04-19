@@ -72,9 +72,8 @@ app.post('/workplaces', async (req, res) => {
         const newWorkplace = new Workplace({
             user: req.session.user._id,
             name: `Chat ${new Date().toLocaleString()}`,
-            messages: [
-                { sender: "bot", text: "Hello! I'm your personal chef assistant, how can I help?" }
-            ]
+            messages: []
+
         });
 
         await newWorkplace.save();
@@ -700,11 +699,38 @@ app.post('/save-recipe', async (req, res) => {
             return res.status(404).json({ success: false, message: "Workplace not found." });
         }
 
-        const newRecipe = new Recipe({
-            user: req.session.user._id, 
-            workplace: workplaceId,  // Associate recipe with workplace
-            content: recipeContent
-        });
+        // Ask AI to extract title + description
+const prompt = `
+From the following recipe content, extract:
+1. A short, clear title (just the name of the dish).
+2. A 1–2 sentence engaging description.
+
+Format your response as:
+Title: [title]
+Description: [description]
+
+Recipe:
+${recipeContent}
+`;
+
+const result = await model.generateContent(prompt);
+const text = result.response.text();
+
+const titleMatch = text.match(/Title:\s*(.+)/i);
+const descMatch = text.match(/Description:\s*([\s\S]+)/i);
+
+const title = titleMatch ? titleMatch[1].trim() : "Untitled";
+const description = descMatch ? descMatch[1].trim() : "No description provided.";
+
+// Now save everything to the database
+const newRecipe = new Recipe({
+    user: req.session.user._id,
+    workplace: workplaceId,
+    content: recipeContent,
+    title,
+    description
+});
+
 
         await newRecipe.save();
         res.json({ success: true, message: "Recipe saved successfully!" });

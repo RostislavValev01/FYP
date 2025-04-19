@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // Clear workplaces on logout
             localStorage.removeItem("workplaces");
             localStorage.removeItem("activeWorkplace");
+            renderWorkplaces(); // show guest greeting
+
         }
     })
     .catch(error => console.error("Error checking login status:", error));
@@ -123,7 +125,10 @@ data.recommendations.forEach(recipe => {
             chatBox.innerHTML = ""; // Prevent duplicate messages
     
             if (data.workplace.messages.length === 0) {
-                const greeting = "Hello! I'm your personal chef assistant, how can I help?";
+                const greeting = isLoggedIn
+    ? "Hello! I'm your personal chef assistant, how can I help?"
+    : `Hi chef! I'm your personal cooking assistant. I can give you step-by-step cooking instructions, create meal plans, recommend recipes based on your preferences, and even suggest meals using leftovers from your fridge. You can also save your favorite recipes for later—just log in or create an account to get started!`;
+
                 displayMessage(greeting, "bot");
             
                 // Save the greeting to the backend
@@ -174,104 +179,95 @@ data.recommendations.forEach(recipe => {
 
     function renderWorkplaces() {
         fetch('/workplaces', { method: "GET", credentials: "include" })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                localStorage.setItem("workplaces", JSON.stringify(data.workplaces));
+            .then(response => {
+                if (!response.ok) throw new Error("Not logged in");
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem("workplaces", JSON.stringify(data.workplaces));
     
-                const workplacesContainer = document.getElementById("workplaces-container");
-                workplacesContainer.innerHTML = ""; // Clear previous workplaces
+                    const workplacesContainer = document.getElementById("workplaces-container");
+                    workplacesContainer.innerHTML = ""; // Clear previous workplaces
     
-                if (data.workplaces.length === 0) {
-                    console.log("No workplaces found. Creating a new one...");
-                    createNewWorkplace();
-                    return;
-                }
-    
-                const showDelete = data.workplaces.length > 1; // ✅ Only show delete if more than one
-    
-                data.workplaces.forEach(workplace => {
-                    const workplaceDiv = document.createElement("div");
-                    workplaceDiv.classList.add("workplace-item");
-                    workplaceDiv.textContent = workplace.name;
-                    workplaceDiv.dataset.id = workplace._id;
-                
-                    // Attach click event to switch workplaces
-                    workplaceDiv.addEventListener("click", () => switchWorkplace(workplace._id));
-                
-                    // Create a flex container to hold buttons
-                    const buttonGroup = document.createElement("div");
-                    buttonGroup.classList.add("workplace-button-group"); // optional if you add the CSS class
-                    // Alternatively, use inline styles:
-                    // buttonGroup.style.display = "flex";
-                    // buttonGroup.style.gap = "8px";
-                    // buttonGroup.style.marginTop = "6px";
-                
-                    // Conditionally create Delete Button
-                    if (showDelete) {
-                        const deleteBtn = document.createElement("button");
-                        deleteBtn.classList.add("delete-workplace-btn");
-                        deleteBtn.textContent = "Remove";
-                        deleteBtn.addEventListener("click", (event) => {
-                            event.stopPropagation(); // Prevent switching chat
-                            deleteWorkplace(workplace._id);
-                        });
-                        buttonGroup.appendChild(deleteBtn);
+                    if (data.workplaces.length === 0) {
+                        console.log("No workplaces found. Creating a new one...");
+                        createNewWorkplace();
+                        return;
                     }
-                
-                    // Create Edit Button
-                    const editBtn = document.createElement("button");
-                    editBtn.classList.add("edit-workplace-btn");
-                    editBtn.textContent = "Edit";
-                    editBtn.style.color = "blue";
-                
-                    editBtn.addEventListener("click", (event) => {
-                        event.stopPropagation(); // Avoid triggering chat switch
-                        const newName = prompt("Enter a new name for this chat:", workplace.name);
-                        if (newName && newName.trim().length > 1) {
-                            fetch(`/workplaces/${workplace._id}/rename`, {
-                                method: "PUT",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ newName }),
-                                credentials: "include"
-                            })
-                            .then(async res => {
-                                if (!res.ok) {
-                                    const errorText = await res.text();
-                                    throw new Error(`Server error: ${res.status} - ${errorText}`);
-                                }
-                                return res.json();
-                            })
-                            .then(data => {
-                                if (data.success) {
-                                    renderWorkplaces(); // Refresh list
-                                } else {
-                                    alert("Failed to rename chat.");
-                                }
-                            })
-                            .catch(err => {
-                                console.error("Rename error:", err);
-                                alert("Rename failed.");
-                            });
-                        }
-                    });
-                
-                    buttonGroup.appendChild(editBtn);
-                
-                    // Add button group to the workplace item
-                    workplaceDiv.appendChild(buttonGroup);
-                    workplacesContainer.appendChild(workplaceDiv);
-                });
-                
     
-                // Auto-switch to first if none is selected
-                if (!localStorage.getItem("activeWorkplace") && data.workplaces.length > 0) {
-                    switchWorkplace(data.workplaces[0]._id);
+                    const showDelete = data.workplaces.length > 1;
+    
+                    data.workplaces.forEach(workplace => {
+                        const workplaceDiv = document.createElement("div");
+                        workplaceDiv.classList.add("workplace-item");
+                        workplaceDiv.textContent = workplace.name;
+                        workplaceDiv.dataset.id = workplace._id;
+    
+                        workplaceDiv.addEventListener("click", () => switchWorkplace(workplace._id));
+    
+                        const buttonGroup = document.createElement("div");
+                        buttonGroup.classList.add("workplace-button-group");
+    
+                        if (showDelete) {
+                            const deleteBtn = document.createElement("button");
+                            deleteBtn.classList.add("delete-workplace-btn");
+                            deleteBtn.textContent = "Remove";
+                            deleteBtn.addEventListener("click", (event) => {
+                                event.stopPropagation();
+                                deleteWorkplace(workplace._id);
+                            });
+                            buttonGroup.appendChild(deleteBtn);
+                        }
+    
+                        const editBtn = document.createElement("button");
+                        editBtn.classList.add("edit-workplace-btn");
+                        editBtn.textContent = "Edit";
+                        editBtn.style.color = "blue";
+    
+                        editBtn.addEventListener("click", (event) => {
+                            event.stopPropagation();
+                            const newName = prompt("Enter a new name for this chat:", workplace.name);
+                            if (newName && newName.trim().length > 1) {
+                                fetch(`/workplaces/${workplace._id}/rename`, {
+                                    method: "PUT",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ newName }),
+                                    credentials: "include"
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        renderWorkplaces();
+                                    } else {
+                                        alert("Failed to rename chat.");
+                                    }
+                                })
+                                .catch(err => {
+                                    console.error("Rename error:", err);
+                                    alert("Rename failed.");
+                                });
+                            }
+                        });
+    
+                        buttonGroup.appendChild(editBtn);
+                        workplaceDiv.appendChild(buttonGroup);
+                        workplacesContainer.appendChild(workplaceDiv);
+                    });
+    
+                    // Auto-switch to first if none selected
+                    if (!localStorage.getItem("activeWorkplace") && data.workplaces.length > 0) {
+                        switchWorkplace(data.workplaces[0]._id);
+                    }
                 }
-            }
-        })
-        .catch(error => console.error("Error fetching workplaces:", error));
+            })
+            .catch(() => {
+                // Fallback for not logged in
+                const greeting = `Hi chef! I'm your personal cooking assistant. I can give you step-by-step cooking instructions, create meal plans, recommend recipes based on your preferences, and even suggest meals using leftovers from your fridge. You can also save your favorite recipes for later—just log in or create an account to get started!`;
+                displayMessage(greeting, "bot");
+            });
     }
+    
     
     
     

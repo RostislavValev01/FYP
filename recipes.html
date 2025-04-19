@@ -75,25 +75,12 @@
                         card.addEventListener("click", () => showModal(card.querySelector("h3").textContent, bodyHTML, recipe._id));
                         container.appendChild(card);
     
-                        fetch('/generate-recipe-description', {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ content: fullText }),
-                            credentials: "include"
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.success) {
-                                card.querySelector("h3").textContent = data.title;
-                                card.querySelector("p").textContent = data.description;
-                            } else {
-                                card.querySelector("p").textContent = "Description unavailable.";
-                            }
-                        })
-                        .catch(err => {
-                            console.error("Description fetch failed:", err);
-                            card.querySelector("p").textContent = "Error loading description.";
-                        });
+                        card.innerHTML = `
+    <h3>${recipe.title || "<em>Untitled</em>"}</h3>
+    <p>${recipe.description || "<em>No description available.</em>"}</p>
+    <div class="recipe-timestamp">Saved: ${new Date(recipe.createdAt).toLocaleString()}</div>
+`;
+
                     });
                 })
                 .catch(() => {
