@@ -461,31 +461,32 @@ app.post('/random-recipe', async (req, res) => {
     const { responseLength, workplaceId } = req.body;
     const userPreferences = req.session.user.preferences || [];
 
-    let lengthInstruction = responseLength === "1" ? "Provide a concise response." :
-                            responseLength === "3" ? "Provide an extremely detailed response." :
-                            "Provide a balanced response.";
+    let lengthInstruction = responseLength === "1"
+        ? "Provide a concise response."
+        : responseLength === "3"
+            ? "Provide an extremely detailed response."
+            : "Provide a balanced response.";
 
     let preferenceInstruction = userPreferences.length > 0
         ? `Ensure the recipe strictly follows these dietary preferences: ${userPreferences.join(", ")}.`
         : "Generate any random recipe.";
 
-        // Create random cues to increase prompt entropy
-const themes = [
-    "inspired by a local street food culture",
-    "made with only 5 ingredients",
-    "perfect for a rainy day",
-    "based on a family secret recipe",
-    "with a global fusion twist",
-    "that includes an unexpected flavor combo",
-    "inspired by childhood favorites",
-    "good for camping or outdoor cooking",
-    "centered around seasonal produce",
-    "using only pantry staples"
-];
+    const themes = [
+        "inspired by a local street food culture",
+        "made with only 5 ingredients",
+        "perfect for a rainy day",
+        "based on a family secret recipe",
+        "with a global fusion twist",
+        "that includes an unexpected flavor combo",
+        "inspired by childhood favorites",
+        "good for camping or outdoor cooking",
+        "centered around seasonal produce",
+        "using only pantry staples"
+    ];
 
-const randomCue = themes[Math.floor(Math.random() * themes.length)];
+    const randomCue = themes[Math.floor(Math.random() * themes.length)];
 
-const prompt = `
+    const prompt = `
 You are an imaginative and creative AI chef. Generate a completely unique and delicious recipe ${randomCue}. Avoid repeating popular or previously mentioned recipes like "Spicy Peanut Noodles".
 
 ${lengthInstruction}
@@ -494,46 +495,80 @@ ${preferenceInstruction}
 Only return the recipe. Do not include greetings or explanations.
 `;
 
-        
-
     try {
         const result = await model.generateContent(prompt);
         let botResponse = result.response.text().replace(/\n/g, '<br>');
 
-        // Save to chat history if a workplace is given
+        // 🖼️ Image generation
+        const axios = require("axios");
+        const fs = require("fs");
+        const path = require("path");
+        const crypto = require("crypto");
+
+        let imageUrl = null;
+        let localImagePath = null;
+
+        try {
+            const imageResponse = await openai.createImage({
+                prompt: `Ultra-realistic, high-quality food photography of a beautifully plated dish: ${botResponse.slice(0, 100)}.`,
+                n: 1,
+                size: "512x512",
+                response_format: "url"
+            });
+
+            imageUrl = imageResponse.data.data[0].url;
+
+            const fileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.png`;
+            const filePath = path.join(__dirname, "public", "images", "recipes", fileName);
+
+            const writer = fs.createWriteStream(filePath);
+            const imageStream = await axios({
+                url: imageUrl,
+                method: "GET",
+                responseType: "stream"
+            });
+
+            await new Promise((resolve, reject) => {
+                imageStream.data.pipe(writer);
+                writer.on("finish", resolve);
+                writer.on("error", reject);
+            });
+
+            localImagePath = `/images/recipes/${fileName}`;
+        } catch (err) {
+            console.error("Image generation failed:", err.message);
+            localImagePath = "https://source.unsplash.com/featured/?food";
+        }
+
+        botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
+
+        // 📝 Save to chat if needed
         if (workplaceId && mongoose.Types.ObjectId.isValid(workplaceId)) {
             const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
+
             if (workplace) {
                 workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
                 workplace.messages.push({ sender: "bot", text: botResponse });
-                
-                // If this is the first actual recipe response (after intro)
+
                 if (workplace.messages.length === 3) {
                     try {
                         const titlePrompt = `
-                        Extract a short, clear, and creative title from this recipe:
-                
-                        ${botResponse.replace(/<br>/g, '\n')}
-                
-                        Only return the name of the dish. Do not include any extra text.
-                        `;
-                
+Extract a short, clear, and creative title from this recipe:
+
+${botResponse.replace(/<br>/g, '\n')}
+
+Only return the name of the dish.
+`;
                         const titleResult = await model.generateContent(titlePrompt);
                         let extractedTitle = titleResult.response.text().trim();
-                
-                        if (!extractedTitle || extractedTitle.length < 3) {
-                            extractedTitle = "Random Recipe";
-                        }
-                
-                        workplace.name = extractedTitle;
+
+                        workplace.name = extractedTitle || "Random Recipe";
                     } catch (err) {
-                        console.error("Error generating title from recipe:", err);
                         workplace.name = "Random Recipe";
                     }
                 }
-                
+
                 await workplace.save();
-                
             }
         }
 
@@ -543,6 +578,7 @@ Only return the recipe. Do not include greetings or explanations.
         res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
+
 
 
 app.post('/signin', async (req, res) => {
