@@ -352,45 +352,63 @@ app.put('/workplaces/:id/rename', async (req, res) => {
 
 await workplace.save();
 
-
-
-await workplace.save();
-
 const isRecipeRequest = /recipe|how do i cook|how to cook|make me a|give me a recipe|dish/i.test(userInput);
 
+const axios = require("axios");
+const fs = require("fs");
+const crypto = require("crypto");
+
 let imageUrl = null;
+let localImagePath = null;
 
 if (isRecipeRequest) {
   try {
     const imageResponse = await openai.createImage({
-        prompt: `Ultra-realistic, high-quality food photography of a beautifully plated dish: ${userInput}. Studio lighting, shallow depth of field, realistic textures, vibrant colors.`
-        ,
+      prompt: `Ultra-realistic, high-quality food photography of a beautifully plated dish: ${userInput}. Studio lighting, shallow depth of field, realistic textures, vibrant colors.`,
       n: 1,
       size: "512x512",
       response_format: "url"
     });
 
     imageUrl = imageResponse.data.data[0].url;
+
+    // Download the image and store locally
+    const fileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.png`;
+    const filePath = path.join(__dirname, "public", "images", "recipes", fileName);
+
+    const writer = fs.createWriteStream(filePath);
+    const imageStream = await axios({
+      url: imageUrl,
+      method: "GET",
+      responseType: "stream"
+    });
+
+    await new Promise((resolve, reject) => {
+      imageStream.data.pipe(writer);
+      writer.on("finish", resolve);
+      writer.on("error", reject);
+    });
+
+    // Use local image path for embedding
+    localImagePath = `/images/recipes/${fileName}`;
+
   } catch (error) {
-    console.error("Image generation failed:", error.response?.data || error.message || error);
+    console.error("Image download failed:", error.message);
   }
 }
 
+// Final fallback image
+if (!localImagePath) {
+  localImagePath = "https://source.unsplash.com/featured/?food";
+}
 
-if (isRecipeRequest) {
-    if (!imageUrl) {
-      imageUrl = "https://source.unsplash.com/featured/?food";
-    }
-  
-    botResponse += `<br><br><img src="${imageUrl}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
-  }
-  
+// Append the local image URL to the bot response
+botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
+
+
   res.json({ botResponse });
   
   
-  
-
-
     } catch (error) {
         console.error("Error with AI request:", error);
         res.status(500).json({ botResponse: "Error: AI processing failed. Try again later." });
