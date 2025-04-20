@@ -352,7 +352,34 @@ app.put('/workplaces/:id/rename', async (req, res) => {
 
 await workplace.save();
 
-const isRecipeRequest = /recipe|how do i cook|how to cook|make me a|give me a recipe|dish/i.test(userInput);
+const loweredInput = userInput.toLowerCase().trim();
+
+// Define known false-positive patterns to avoid
+const nonRecipePatterns = [
+  /meal\s*plan/,
+  /nutrition|nutritional/i,
+  /calories|protein|carbs|fat/i,
+  /substitute|swap/i,
+  /what\s+are\s+some/i,
+  /can\s+i\s+use/i,
+  /how\s+healthy/i,
+  /how\s+many\s+(calories|grams)/i,
+  /how long/i,
+  /store|freeze|leftovers/i,
+  /benefits of/i,
+  /is this/i,
+  /shopping list|grocery list|ingredients (needed|for)/i,
+  /fun fact|fact about|info about|tell me about|background of|origin of|history of/i    
+];
+
+// Skip image generation if any of these match
+const blocked = nonRecipePatterns.some(pattern => pattern.test(loweredInput));
+
+// Then match actual recipe requests
+const isRecipeRequest =
+  !blocked &&
+  /\b(make|cook|give me|suggest|create|recommend|new)\b.*\b(recipe|dish)\b/i.test(loweredInput);
+
 
 if (isRecipeRequest) {
   const axios = require("axios");
