@@ -354,14 +354,15 @@ await workplace.save();
 
 const isRecipeRequest = /recipe|how do i cook|how to cook|make me a|give me a recipe|dish/i.test(userInput);
 
-const axios = require("axios");
-const fs = require("fs");
-const crypto = require("crypto");
-
-let imageUrl = null;
-let localImagePath = null;
-
 if (isRecipeRequest) {
+  const axios = require("axios");
+  const fs = require("fs");
+  const crypto = require("crypto");
+  const path = require("path");
+
+  let imageUrl = null;
+  let localImagePath = null;
+
   try {
     const imageResponse = await openai.createImage({
       prompt: `Ultra-realistic, high-quality food photography of a beautifully plated dish: ${userInput}. Studio lighting, shallow depth of field, realistic textures, vibrant colors.`,
@@ -372,7 +373,6 @@ if (isRecipeRequest) {
 
     imageUrl = imageResponse.data.data[0].url;
 
-    // Download the image and store locally
     const fileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}.png`;
     const filePath = path.join(__dirname, "public", "images", "recipes", fileName);
 
@@ -389,21 +389,16 @@ if (isRecipeRequest) {
       writer.on("error", reject);
     });
 
-    // Use local image path for embedding
     localImagePath = `/images/recipes/${fileName}`;
-
   } catch (error) {
-    console.error("Image download failed:", error.message);
+    console.error("Image generation failed:", error.message);
+    localImagePath = "https://source.unsplash.com/featured/?food";
   }
+
+  // Append the image only for recipe-related queries
+  botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
 }
 
-// Final fallback image
-if (!localImagePath) {
-  localImagePath = "https://source.unsplash.com/featured/?food";
-}
-
-// Append the local image URL to the bot response
-botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
 workplace.messages.push({ sender: "bot", text: botResponse });
 await workplace.save();
 
