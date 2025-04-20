@@ -460,6 +460,11 @@ app.post('/random-recipe', async (req, res) => {
     }
 
     const { responseLength, workplaceId } = req.body;
+
+    const workplace = workplaceId && mongoose.Types.ObjectId.isValid(workplaceId)
+        ? await Workplace.findOne({ _id: workplaceId, user: req.session.user._id })
+        : null;
+
     const userPreferences = req.session.user.preferences || [];
 
     let lengthInstruction = responseLength === "1"
@@ -499,8 +504,7 @@ Only return the recipe. Do not include greetings or explanations.
     try {
         const result = await model.generateContent(prompt);
         let botResponse = result.response.text().replace(/\n/g, '<br>');
-        workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
-        workplace.messages.push({ sender: "bot", text: botResponse });
+
         // 🖼️ Image generation
         const axios = require("axios");
         const fs = require("fs");
@@ -542,36 +546,33 @@ Only return the recipe. Do not include greetings or explanations.
             localImagePath = "https://source.unsplash.com/featured/?food";
         }
 
+        // Add image to bot response
         botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
-        workplace.messages.push({ sender: "bot", text: botResponse });
 
-        // 📝 Save to chat if needed
-        if (workplaceId && mongoose.Types.ObjectId.isValid(workplaceId)) {
-            const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
+        // Save chat messages
+        if (workplace) {
+            workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
+            workplace.messages.push({ sender: "bot", text: botResponse });
 
-            if (workplace) {
-                
-
-                if (workplace.messages.length === 3) {
-                    try {
-                        const titlePrompt = `
+            if (workplace.messages.length === 3) {
+                try {
+                    const titlePrompt = `
 Extract a short, clear, and creative title from this recipe:
 
 ${botResponse.replace(/<br>/g, '\n')}
 
 Only return the name of the dish.
 `;
-                        const titleResult = await model.generateContent(titlePrompt);
-                        let extractedTitle = titleResult.response.text().trim();
+                    const titleResult = await model.generateContent(titlePrompt);
+                    let extractedTitle = titleResult.response.text().trim();
 
-                        workplace.name = extractedTitle || "Random Recipe";
-                    } catch (err) {
-                        workplace.name = "Random Recipe";
-                    }
+                    workplace.name = extractedTitle || "Random Recipe";
+                } catch (err) {
+                    workplace.name = "Random Recipe";
                 }
-
-                await workplace.save();
             }
+
+            await workplace.save();
         }
 
         res.json({ botResponse });
@@ -580,6 +581,7 @@ Only return the name of the dish.
         res.status(500).json({ botResponse: "Error: Something went wrong. Try again later." });
     }
 });
+
 
 
 
