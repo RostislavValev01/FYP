@@ -254,7 +254,7 @@ app.post('/chat', async (req, res) => {
 
       // Add user and bot messages
 workplace.messages.push({ sender: "user", text: userInput });
-workplace.messages.push({ sender: "bot", text: botResponse });
+
 
 // If this is the first actual user message (after intro)
 if (workplace.name.startsWith("Chat ") && workplace.messages.length <= 3)
@@ -404,7 +404,8 @@ if (!localImagePath) {
 
 // Append the local image URL to the bot response
 botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
-
+workplace.messages.push({ sender: "bot", text: botResponse });
+await workplace.save();
 
   res.json({ botResponse });
   
@@ -498,7 +499,8 @@ Only return the recipe. Do not include greetings or explanations.
     try {
         const result = await model.generateContent(prompt);
         let botResponse = result.response.text().replace(/\n/g, '<br>');
-
+        workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
+        workplace.messages.push({ sender: "bot", text: botResponse });
         // 🖼️ Image generation
         const axios = require("axios");
         const fs = require("fs");
@@ -541,14 +543,14 @@ Only return the recipe. Do not include greetings or explanations.
         }
 
         botResponse += `<br><br><img src="${localImagePath}" alt="Recipe Image" style="max-width:100%; border-radius:10px; margin-top:15px;">`;
+        workplace.messages.push({ sender: "bot", text: botResponse });
 
         // 📝 Save to chat if needed
         if (workplaceId && mongoose.Types.ObjectId.isValid(workplaceId)) {
             const workplace = await Workplace.findOne({ _id: workplaceId, user: req.session.user._id });
 
             if (workplace) {
-                workplace.messages.push({ sender: "user", text: "Give me a random recipe" });
-                workplace.messages.push({ sender: "bot", text: botResponse });
+                
 
                 if (workplace.messages.length === 3) {
                     try {
